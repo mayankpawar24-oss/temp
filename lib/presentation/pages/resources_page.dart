@@ -5,11 +5,11 @@ import 'package:maternal_infant_care/data/models/resource_article_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
 import 'package:maternal_infant_care/presentation/widgets/resource_card.dart';
 import 'package:maternal_infant_care/presentation/pages/careflow_ai_page.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:maternal_infant_care/presentation/pages/disease_awareness_page.dart';
 import 'package:maternal_infant_care/presentation/pages/nutrition_guidance_page.dart';
 import 'package:maternal_infant_care/presentation/pages/daily_tips_page.dart';
 import 'package:maternal_infant_care/presentation/pages/hospital_bag_page.dart';
+import 'package:maternal_infant_care/presentation/pages/garbha_sanskar_page.dart';
 
 class ResourcesPage extends ConsumerStatefulWidget {
   const ResourcesPage({super.key});
@@ -35,12 +35,15 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
   Widget build(BuildContext context) {
     final userProfile = ref.watch(userProfileProvider);
     final allArticles = _getArticles(userProfile);
-    
+
     // Filter articles based on search and category
     final filteredArticles = allArticles.where((article) {
-      final matchesSearch = article.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+      final matchesSearch = article.title
+              .toLowerCase()
+              .contains(searchQuery.toLowerCase()) ||
           article.description.toLowerCase().contains(searchQuery.toLowerCase());
-      final matchesCategory = selectedCategory == 'All' || article.category == selectedCategory;
+      final matchesCategory =
+          selectedCategory == 'All' || article.category == selectedCategory;
       return matchesSearch && matchesCategory;
     }).toList();
 
@@ -56,7 +59,8 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
         foregroundColor: isDarkMode ? Colors.white : const Color(0xFF4A4A4A),
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
+          statusBarIconBrightness:
+              isDarkMode ? Brightness.light : Brightness.dark,
         ),
       ),
       body: Stack(
@@ -65,45 +69,53 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
           Container(
             color: Theme.of(context).scaffoldBackgroundColor,
           ),
-          
+
           CustomScrollView(
             slivers: [
               // Add top padding for status bar + transparency
               SliverToBoxAdapter(
-                child: SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight),
+                child: SizedBox(
+                    height:
+                        MediaQuery.of(context).padding.top + kToolbarHeight),
               ),
-              
+
               SliverToBoxAdapter(
                 child: _buildSearchAndFilters(context),
               ),
-              
+
               filteredArticles.isEmpty
                   ? SliverFillRemaining(
                       hasScrollBody: false,
                       child: _buildEmptyState(context),
                     )
                   : SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             // Build rows of 2 items each
                             final startIndex = index * 2;
-                            if (startIndex >= filteredArticles.length) return null;
-                            
+                            if (startIndex >= filteredArticles.length)
+                              return null;
+
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 16),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
-                                    child: ResourceCard(article: filteredArticles[startIndex]),
+                                    child: ResourceCard(
+                                        article: filteredArticles[startIndex]),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
-                                    child: startIndex + 1 < filteredArticles.length
-                                        ? ResourceCard(article: filteredArticles[startIndex + 1])
-                                        : const SizedBox(),
+                                    child:
+                                        startIndex + 1 < filteredArticles.length
+                                            ? ResourceCard(
+                                                article: filteredArticles[
+                                                    startIndex + 1])
+                                            : const SizedBox(),
                                   ),
                                 ],
                               ),
@@ -113,7 +125,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
                         ),
                       ),
                     ),
-              
+
               // Bottom padding
               const SliverToBoxAdapter(
                 child: SizedBox(height: 80),
@@ -141,34 +153,39 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
 
   Widget _buildSearchAndFilters(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF2D3142);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Greeting / Hero Section
+          // Greeting / Hero Section - Aligned with Ancient Indian theme
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
-              'Discover Helpful\nInsights & Guides ✨',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+              'Discover Helpful\nInsights & Guides',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.secondary,
+              ),
             ),
           ),
-          
-          // Search Bar
+
+          // Search Bar - Ornate styling with gold borders
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(20),
+              color: theme.cardTheme.color,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: colorScheme.secondary,
+                width: 2,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
+                  color: colorScheme.secondary.withOpacity(0.15),
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -177,22 +194,29 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
               onChanged: (value) => setState(() => searchQuery = value),
               decoration: InputDecoration(
                 hintText: 'Search for articles...',
-                hintStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
-                prefixIcon: Icon(Icons.search, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: colorScheme.secondary,
+                  size: 24,
+                ),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // Explore Guides Section
           Text(
             'Explore Guides',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.secondary,
+            ),
           ),
           const SizedBox(height: 12),
           GridView.count(
@@ -201,32 +225,49 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 1.1,
+            childAspectRatio: 1.05,
             padding: EdgeInsets.zero,
             children: [
               _CategoryCard(
+                title: 'Garbha Sanskar',
+                icon: Icons.spa,
+                color: const Color(0xFF800000),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const GarbhaSanskarPage())),
+              ),
+              _CategoryCard(
                 title: 'Medical',
                 icon: Icons.medical_services_outlined,
-                color: Colors.redAccent,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiseaseAwarenessPage())),
+                color: const Color(0xFFCD5C5C),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const DiseaseAwarenessPage())),
               ),
               _CategoryCard(
                 title: 'Nutrition',
                 icon: Icons.restaurant_menu,
-                color: Colors.orangeAccent,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NutritionGuidancePage())),
+                color: const Color(0xFFDAA520),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const NutritionGuidancePage())),
               ),
               _CategoryCard(
                 title: 'Daily Tips',
                 icon: Icons.lightbulb_outline,
-                color: Colors.green,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DailyTipsPage())),
+                color: const Color(0xFFB8860B),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const DailyTipsPage())),
               ),
               _CategoryCard(
                 title: 'Labour Prep',
                 icon: Icons.child_friendly,
-                color: Colors.blueAccent,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HospitalBagPage())),
+                color: const Color(0xFF8B4513),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const HospitalBagPage())),
               ),
             ],
           ),
@@ -235,10 +276,10 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
           // Category Chips
           Text(
             'Browse Articles',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.secondary,
+            ),
           ),
           const SizedBox(height: 12),
           SingleChildScrollView(
@@ -254,25 +295,30 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
                     onSelected: (selected) {
                       setState(() => selectedCategory = category);
                     },
-                    backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white.withOpacity(0.5),
-                    selectedColor: isDark ? const Color(0xFF4A148C) : const Color(0xFFE1BEE7),
+                    backgroundColor: theme.cardTheme.color?.withOpacity(0.5) ??
+                        (isDark
+                            ? const Color(0xFF4E342E)
+                            : const Color(0xFFFFF8E1)),
+                    selectedColor: colorScheme.secondary.withOpacity(0.3),
                     showCheckmark: false,
                     labelStyle: TextStyle(
-                      color: isSelected 
-                        ? (isDark ? Colors.white : const Color(0xFF4A148C))
-                        : (isDark ? Colors.white70 : const Color(0xFF455A64)),
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected
+                          ? colorScheme.primary
+                          : colorScheme.onSurface.withOpacity(0.7),
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w500,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: isSelected 
-                          ? Colors.transparent 
-                          : (isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.8)),
-                        width: 1,
+                        color: isSelected
+                            ? colorScheme.secondary
+                            : colorScheme.secondary.withOpacity(0.3),
+                        width: isSelected ? 1.5 : 1,
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                 );
               }).toList(),
@@ -282,7 +328,6 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
       ),
     );
   }
-
 
   Widget _buildEmptyState(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -683,40 +728,61 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Card(
       elevation: 0,
-      color: isDark ? const Color(0xFF1E293B) : Colors.white.withOpacity(0.6),
+      margin: EdgeInsets.zero,
+      color: theme.cardTheme.color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.5)
+          color: color,
+          width: 2.5,
         ),
       ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.08),
+                color.withOpacity(0.03),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: color.withOpacity(0.4),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(icon, color: color, size: 32),
               ),
-              child: Icon(icon, color: color, size: 28),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title, 
-              style: TextStyle(
-                fontWeight: FontWeight.bold, 
-                color: isDark ? Colors.white : const Color(0xFF2D3142)
-              )
-            ),
-          ],
+              const SizedBox(height: 14),
+              Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:maternal_infant_care/core/constants/app_constants.dart';
 import 'package:maternal_infant_care/data/models/pregnancy_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/widgets/pregnancy_timeline_widget.dart';
@@ -11,7 +10,8 @@ class PregnancyTrackingPage extends ConsumerStatefulWidget {
   const PregnancyTrackingPage({super.key});
 
   @override
-  ConsumerState<PregnancyTrackingPage> createState() => _PregnancyTrackingPageState();
+  ConsumerState<PregnancyTrackingPage> createState() =>
+      _PregnancyTrackingPageState();
 }
 
 class _PregnancyTrackingPageState extends ConsumerState<PregnancyTrackingPage>
@@ -57,7 +57,8 @@ class _PregnancyTrackingPageState extends ConsumerState<PregnancyTrackingPage>
                   Icon(
                     Icons.pregnant_woman,
                     size: 64,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -135,7 +136,8 @@ class _OverviewTabState extends State<_OverviewTab> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.image_not_supported, color: Colors.white, size: 48),
+                            const Icon(Icons.image_not_supported,
+                                color: Colors.white, size: 48),
                             const SizedBox(height: 8),
                             Text(
                               'Month $_selectedMonth Visualization Missing',
@@ -202,7 +204,9 @@ class _OverviewTabState extends State<_OverviewTab> {
                                 'M$month',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
+                                  fontWeight: isSelected || isToday
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                   fontSize: 14,
                                 ),
                               ),
@@ -225,7 +229,7 @@ class _OverviewTabState extends State<_OverviewTab> {
               ),
             ],
           ),
-          
+
           // Stats & Information Panel
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -240,17 +244,24 @@ class _OverviewTabState extends State<_OverviewTab> {
                       children: [
                         Text(
                           'Development: Month $_selectedMonth',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
-                          _selectedMonth == widget.pregnancy.currentMonth 
-                            ? 'Your current milestone' 
-                            : 'Future growth stage',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              ),
+                          _selectedMonth == widget.pregnancy.currentMonth
+                              ? 'Your current milestone'
+                              : 'Future growth stage',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.6),
+                                  ),
                         ),
                       ],
                     ),
@@ -263,13 +274,17 @@ class _OverviewTabState extends State<_OverviewTab> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                         Column(
+                        Column(
                           children: [
                             Text(
                               '$weeksPregnant',
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                             ),
                             Text(
@@ -278,13 +293,20 @@ class _OverviewTabState extends State<_OverviewTab> {
                             ),
                           ],
                         ),
-                        Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.3)),
+                        Container(
+                            height: 40,
+                            width: 1,
+                            color: Colors.grey.withOpacity(0.3)),
                         _StatItem(
                           label: 'Due Date',
-                          value: DateFormat('MMM dd').format(widget.pregnancy.dueDate),
+                          value: DateFormat('MMM dd')
+                              .format(widget.pregnancy.dueDate),
                           icon: Icons.calendar_today,
                         ),
-                        Container(height: 40, width: 1, color: Colors.grey.withOpacity(0.3)),
+                        Container(
+                            height: 40,
+                            width: 1,
+                            color: Colors.grey.withOpacity(0.3)),
                         _StatItem(
                           label: 'Days Left',
                           value: '$daysUntilDue',

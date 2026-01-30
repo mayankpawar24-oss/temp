@@ -5,7 +5,8 @@ class NutritionGuidancePage extends ConsumerStatefulWidget {
   const NutritionGuidancePage({super.key});
 
   @override
-  ConsumerState<NutritionGuidancePage> createState() => _NutritionGuidancePageState();
+  ConsumerState<NutritionGuidancePage> createState() =>
+      _NutritionGuidancePageState();
 }
 
 class _NutritionGuidancePageState extends ConsumerState<NutritionGuidancePage>
@@ -42,9 +43,11 @@ class _NutritionGuidancePageState extends ConsumerState<NutritionGuidancePage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _AgeGuideTab(selectedAgeRange: selectedAgeRange, onAgeSelected: (age) {
-            setState(() => selectedAgeRange = age);
-          }),
+          _AgeGuideTab(
+              selectedAgeRange: selectedAgeRange,
+              onAgeSelected: (age) {
+                setState(() => selectedAgeRange = age);
+              }),
           _FoodRecommendationsTab(selectedAge: selectedAgeRange),
           _AllergyInfoTab(),
         ],
@@ -65,9 +68,24 @@ class _AgeGuideTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ageRanges = [
-      {'title': '0-6 Months', 'months': '0-6', 'icon': Icons.child_care, 'color': Colors.blue},
-      {'title': '6-12 Months', 'months': '6-12', 'icon': Icons.baby_changing_station, 'color': Colors.orange},
-      {'title': '1-3 Years', 'months': '12-36', 'icon': Icons.self_improvement, 'color': Colors.green},
+      {
+        'title': '0-6 Months',
+        'months': '0-6',
+        'icon': Icons.child_care,
+        'color': Colors.blue
+      },
+      {
+        'title': '6-12 Months',
+        'months': '6-12',
+        'icon': Icons.baby_changing_station,
+        'color': Colors.orange
+      },
+      {
+        'title': '1-3 Years',
+        'months': '12-36',
+        'icon': Icons.self_improvement,
+        'color': Colors.green
+      },
     ];
 
     return GridView.builder(
@@ -96,7 +114,10 @@ class _AgeGuideTab extends StatelessWidget {
                 width: isSelected ? 2 : 1,
               ),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4)),
               ],
             ),
             child: Column(
@@ -108,23 +129,24 @@ class _AgeGuideTab extends StatelessWidget {
                     color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(range['icon'] as IconData, color: color, size: 32),
+                  child:
+                      Icon(range['icon'] as IconData, color: color, size: 32),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   range['title'] as String,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? color : Colors.black87,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? color : Colors.black87,
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${range['months']} months',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                        color: Colors.grey[600],
+                      ),
                 ),
                 if (isSelected) ...[
                   const SizedBox(height: 8),
@@ -165,7 +187,10 @@ class _FoodRecommendationsTab extends StatelessWidget {
             Text(
               'Go to "Age Guide" tab to select',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
                   ),
             ),
           ],
@@ -186,7 +211,8 @@ class _FoodRecommendationsTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary),
+                    Icon(Icons.info_outline,
+                        color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: 8),
                     Text(
                       'Recommended Foods',
@@ -202,7 +228,7 @@ class _FoodRecommendationsTab extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             color: Colors.green,
                             size: 20,
@@ -214,7 +240,10 @@ class _FoodRecommendationsTab extends StatelessWidget {
                               children: [
                                 Text(
                                   food['name'] as String,
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
@@ -222,7 +251,10 @@ class _FoodRecommendationsTab extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     food['info'] as String,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface
@@ -250,7 +282,8 @@ class _FoodRecommendationsTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.warning, color: Theme.of(context).colorScheme.error),
+                    Icon(Icons.warning,
+                        color: Theme.of(context).colorScheme.error),
                     const SizedBox(width: 8),
                     Text(
                       'Foods to Avoid',
@@ -294,7 +327,8 @@ class _FoodRecommendationsTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: Theme.of(context).colorScheme.tertiary),
+                    Icon(Icons.lightbulb_outline,
+                        color: Theme.of(context).colorScheme.tertiary),
                     const SizedBox(width: 8),
                     Text(
                       'Tips',
@@ -354,7 +388,10 @@ class _FoodRecommendationsTab extends StatelessWidget {
       },
       {
         'foods': [
-          {'name': 'Breast Milk / Formula', 'info': 'Continue as primary milk source'},
+          {
+            'name': 'Breast Milk / Formula',
+            'info': 'Continue as primary milk source'
+          },
           {'name': 'Iron-fortified Cereals', 'info': 'Rice, oatmeal cereals'},
           {'name': 'Pureed Fruits', 'info': 'Apple, banana, pear'},
           {'name': 'Pureed Vegetables', 'info': 'Sweet potato, carrot, peas'},
@@ -379,7 +416,10 @@ class _FoodRecommendationsTab extends StatelessWidget {
       {
         'foods': [
           {'name': 'Whole Grains', 'info': 'Whole wheat bread, rice, pasta'},
-          {'name': 'Fruits & Vegetables', 'info': 'All varieties, washed and cut appropriately'},
+          {
+            'name': 'Fruits & Vegetables',
+            'info': 'All varieties, washed and cut appropriately'
+          },
           {'name': 'Proteins', 'info': 'Meat, fish, eggs, beans, lentils'},
           {'name': 'Dairy', 'info': 'Whole milk, yogurt, cheese'},
           {'name': 'Healthy Fats', 'info': 'Avocado, nuts (ground), olive oil'},
@@ -418,7 +458,12 @@ class _AllergyInfoTab extends StatelessWidget {
       },
       {
         'name': 'Eggs',
-        'symptoms': ['Hives', 'Swelling', 'Digestive issues', 'Difficulty breathing'],
+        'symptoms': [
+          'Hives',
+          'Swelling',
+          'Digestive issues',
+          'Difficulty breathing'
+        ],
         'risk': 'High',
         'introduction': 'Start with well-cooked yolk at 6-8 months',
       },
@@ -469,7 +514,8 @@ class _AllergyInfoTab extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+                Icon(Icons.warning_amber_rounded,
+                    color: Theme.of(context).colorScheme.error),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -507,7 +553,7 @@ class _AllergyInfoTab extends StatelessWidget {
                 ),
                 title: Text(
                   allergen['name'] as String,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -520,27 +566,32 @@ class _AllergyInfoTab extends StatelessWidget {
                       children: [
                         Text(
                           'Common Symptoms:',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: (allergen['symptoms'] as List).map((symptom) {
+                          children:
+                              (allergen['symptoms'] as List).map((symptom) {
                             return Chip(
                               label: Text(symptom),
-                              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
                             );
                           }).toList(),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Introduction Guidelines:',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -563,7 +614,8 @@ class _AllergyInfoTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.emergency, color: Theme.of(context).colorScheme.error),
+                    Icon(Icons.emergency,
+                        color: Theme.of(context).colorScheme.error),
                     const SizedBox(width: 8),
                     Text(
                       'When to Seek Immediate Medical Help',
@@ -610,7 +662,8 @@ class _EmergencyIndicator extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.error, color: Theme.of(context).colorScheme.error, size: 20),
+          Icon(Icons.error,
+              color: Theme.of(context).colorScheme.error, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

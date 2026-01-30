@@ -9,21 +9,22 @@ class ResourceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: isDark ? const Color(0xFF1E293B) : Colors.white.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+        color: theme.cardTheme.color,
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.8),
-          width: 1.5,
+          color: colorScheme.secondary.withOpacity(0.4),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: article.color.withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: colorScheme.secondary.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -36,12 +37,13 @@ class ResourceCard extends StatelessWidget {
                   builder: (_) => ArticleViewerPage(article: article)),
             );
           },
-          borderRadius: BorderRadius.circular(24),
+          customBorder: theme.cardTheme.shape,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min, // Changed to min specifically for Masonry
+              mainAxisSize:
+                  MainAxisSize.min, // Changed to min specifically for Masonry
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,7 +51,11 @@ class ResourceCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: article.color.withOpacity(0.2),
+                        color: article.color.withOpacity(0.15),
+                        border: Border.all(
+                          color: article.color.withOpacity(0.3),
+                          width: 1,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(article.icon, color: article.color, size: 22),
@@ -59,17 +65,17 @@ class ResourceCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF0F172A) : Colors.white.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(12),
+                          color: colorScheme.secondary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: article.color.withOpacity(0.3),
+                            color: colorScheme.secondary.withOpacity(0.4),
                             width: 1,
                           ),
                         ),
                         child: Text(
                           article.category,
                           style: TextStyle(
-                            color: article.color,
+                            color: colorScheme.secondary,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
@@ -78,13 +84,14 @@ class ResourceCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 16), // Replaced Spacer to avoid unbound height issues
+                const SizedBox(
+                    height:
+                        16), // Replaced Spacer to avoid unbound height issues
                 Text(
                   article.title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF2D3142),
+                    color: colorScheme.primary,
                     height: 1.2,
                   ),
                   maxLines: 2,
@@ -93,9 +100,8 @@ class ResourceCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   article.description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
                     height: 1.4,
                   ),
                   maxLines: 2,
@@ -107,7 +113,7 @@ class ResourceCard extends StatelessWidget {
                     Icon(
                       Icons.access_time_rounded,
                       size: 14,
-                      color: isDark ? Colors.grey[400] : Colors.grey[500],
+                      color: colorScheme.onSurface.withOpacity(0.6),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -115,7 +121,7 @@ class ResourceCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.grey[400] : Colors.grey[500],
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],

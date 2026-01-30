@@ -111,8 +111,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 decoration: InputDecoration(
                   labelText: 'New Password',
                   suffixIcon: IconButton(
-                    icon: Icon(isObscure ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setDialogState(() => isObscure = !isObscure),
+                    icon: Icon(
+                        isObscure ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () =>
+                        setDialogState(() => isObscure = !isObscure),
                   ),
                 ),
               ),
@@ -138,7 +140,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                 if (password.isEmpty || password.length < 6) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Password must be at least 6 characters')),
+                    const SnackBar(
+                        content:
+                            Text('Password must be at least 6 characters')),
                   );
                   return;
                 }
@@ -155,7 +159,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Password updated successfully')),
+                      const SnackBar(
+                          content: Text('Password updated successfully')),
                     );
                   }
                 } catch (e) {
@@ -182,7 +187,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Notification settings updated')),
+          const SnackBar(content: Text('Notification settings updated')),
         );
       }
     } catch (e) {
@@ -221,7 +226,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: const Icon(Icons.check, color: Colors.green),
                 onPressed: _isLoading ? null : _updateUsername,
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
           const SizedBox(height: 32),
@@ -230,43 +236,57 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ListTile(
             title: const Text('Change Password'),
             subtitle: const Text('Update your account password'),
-            leading: Icon(Icons.lock_outline, color: Theme.of(context).colorScheme.primary),
+            leading: Icon(Icons.lock_outline,
+                color: Theme.of(context).colorScheme.primary),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: _showChangePasswordDialog,
-            tileColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            tileColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.3),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           const SizedBox(height: 32),
           _buildSectionHeader('My Journey'),
           const SizedBox(height: 16),
           ListTile(
             title: Text(journeyLabel),
-            subtitle: Text(userMeta.startDate != null ? DateFormat('MMMM dd, yyyy').format(userMeta.startDate!) : 'Not set'),
-            leading: Icon(journeyIcon, color: Theme.of(context).colorScheme.primary),
+            subtitle: Text(userMeta.startDate != null
+                ? DateFormat('MMMM dd, yyyy').format(userMeta.startDate!)
+                : 'Not set'),
+            leading:
+                Icon(journeyIcon, color: Theme.of(context).colorScheme.primary),
             trailing: const Icon(Icons.edit_outlined, size: 20),
             onTap: _updateStartDate,
-            tileColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            tileColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.3),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           const SizedBox(height: 32),
           _buildSectionHeader('Notifications'),
           const SizedBox(height: 16),
           _buildNotificationToggle(
-            'Daily Tips', 
-            userMeta.tipsEnabled, 
+            'Daily Tips',
+            userMeta.tipsEnabled,
             (val) => _toggleNotification('tips_enabled', userMeta.tipsEnabled),
           ),
           const SizedBox(height: 12),
           _buildNotificationToggle(
-            'Health Checkups', 
-            userMeta.alertsEnabled, 
-            (val) => _toggleNotification('alerts_enabled', userMeta.alertsEnabled),
+            'Health Checkups',
+            userMeta.alertsEnabled,
+            (val) =>
+                _toggleNotification('alerts_enabled', userMeta.alertsEnabled),
           ),
           const SizedBox(height: 12),
           _buildNotificationToggle(
-            'Important Alerts', 
-            userMeta.remindersEnabled, 
-            (val) => _toggleNotification('reminders_enabled', userMeta.remindersEnabled),
+            'Important Alerts',
+            userMeta.remindersEnabled,
+            (val) => _toggleNotification(
+                'reminders_enabled', userMeta.remindersEnabled),
           ),
           const SizedBox(height: 24),
           OutlinedButton.icon(
@@ -295,19 +315,24 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  Widget _buildNotificationToggle(String title, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildNotificationToggle(
+      String title, bool value, ValueChanged<bool> onChanged) {
     return SwitchListTile(
       title: Text(title),
       value: value,
       onChanged: _isLoading ? null : onChanged,
       dense: true,
-      tileColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+      tileColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 
   String _journeyLabel(UserProfileType? role) {
-    if (role == UserProfileType.pregnant || role == UserProfileType.tryingToConceive) {
+    if (role == UserProfileType.pregnant ||
+        role == UserProfileType.tryingToConceive) {
       return 'Last Period Date';
     }
     return 'Baby Birthday';

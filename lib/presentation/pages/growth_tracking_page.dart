@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:maternal_infant_care/data/models/growth_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
@@ -39,10 +38,10 @@ class _GrowthTrackingPageState extends ConsumerState<GrowthTrackingPage> {
                   itemBuilder: (context, index) {
                     final growth = allGrowths[index];
                     return _GrowthItemCard(
-                      growth: growth, 
+                      growth: growth,
                       onDelete: () async {
-                         await repo.deleteGrowth(growth.id);
-                         ref.refresh(growthRepositoryProvider);
+                        await repo.deleteGrowth(growth.id);
+                        ref.refresh(growthRepositoryProvider);
                       },
                     );
                   },
@@ -52,7 +51,8 @@ class _GrowthTrackingPageState extends ConsumerState<GrowthTrackingPage> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: ${error.toString()}')),
+        error: (error, stack) =>
+            Center(child: Text('Error: ${error.toString()}')),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddGrowthDialog(context),
@@ -74,7 +74,8 @@ class _GrowthTrackingPageState extends ConsumerState<GrowthTrackingPage> {
     if (birthday == null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Baby birthday not found. Please setup in profile.')),
+        const SnackBar(
+            content: Text('Baby birthday not found. Please setup in profile.')),
       );
       return;
     }
@@ -108,13 +109,15 @@ class _GrowthTrackingPageState extends ConsumerState<GrowthTrackingPage> {
               const SizedBox(height: 16),
               TextField(
                 controller: headCircumferenceController,
-                decoration: const InputDecoration(labelText: 'Head Circumference (cm)'),
+                decoration:
+                    const InputDecoration(labelText: 'Head Circumference (cm)'),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: notesController,
-                decoration: const InputDecoration(labelText: 'Notes (optional)'),
+                decoration:
+                    const InputDecoration(labelText: 'Notes (optional)'),
                 maxLines: 3,
               ),
             ],
@@ -146,7 +149,9 @@ class _GrowthTrackingPageState extends ConsumerState<GrowthTrackingPage> {
                       ? 0.0
                       : double.parse(headCircumferenceController.text),
                   ageInDays: ageInDays,
-                  notes: notesController.text.isEmpty ? null : notesController.text,
+                  notes: notesController.text.isEmpty
+                      ? null
+                      : notesController.text,
                 );
                 await repo.saveGrowth(growth);
 
@@ -268,9 +273,11 @@ class _GrowthCharts extends StatelessWidget {
 
     return Column(
       children: [
-        ProgressChart(spots: weightSpots, title: 'Weight Trend', yAxisLabel: 'kg'),
+        ProgressChart(
+            spots: weightSpots, title: 'Weight Trend', yAxisLabel: 'kg'),
         const SizedBox(height: 16),
-        ProgressChart(spots: heightSpots, title: 'Height Trend', yAxisLabel: 'cm'),
+        ProgressChart(
+            spots: heightSpots, title: 'Height Trend', yAxisLabel: 'cm'),
       ],
     );
   }
@@ -305,7 +312,8 @@ class _GrowthItemCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.show_chart, color: Theme.of(context).colorScheme.tertiary, size: 28),
+          child: Icon(Icons.show_chart,
+              color: Theme.of(context).colorScheme.tertiary, size: 28),
         ),
         title: Text(
           'Age: ${growth.ageInDays} days',
@@ -328,7 +336,10 @@ class _GrowthItemCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 growth.notes!,
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic),
               ),
             ],
           ],

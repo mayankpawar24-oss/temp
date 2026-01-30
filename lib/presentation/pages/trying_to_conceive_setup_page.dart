@@ -5,6 +5,8 @@ import 'package:maternal_infant_care/data/models/fertility_profile_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/auth_provider.dart';
 import 'package:maternal_infant_care/presentation/pages/main_navigation_shell.dart';
+import 'package:maternal_infant_care/core/services/centralized_translations.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/language_provider.dart';
 
 class TryingToConceiveSetupPage extends ConsumerStatefulWidget {
   const TryingToConceiveSetupPage({super.key});
@@ -43,19 +45,18 @@ class _TryingToConceiveSetupPageState
 
   Future<void> _saveSetup() async {
     final cycleLength = int.tryParse(_cycleLengthController.text.trim());
+    final languageCode = ref.read(languageProvider);
 
     if (_lmpDate == null || cycleLength == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please provide all required details.')),
+        SnackBar(content: Text('ttc.missing_details'.tr(languageCode))),
       );
       return;
     }
 
     if (cycleLength < 20 || cycleLength > 60) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Average cycle length should be between 20 and 60 days.')),
+        SnackBar(content: Text('ttc.cycle_length_range'.tr(languageCode))),
       );
       return;
     }
@@ -63,7 +64,7 @@ class _TryingToConceiveSetupPageState
     final user = ref.read(currentUserProvider);
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No authenticated user found.')),
+        SnackBar(content: Text('ttc.no_user'.tr(languageCode))),
       );
       return;
     }
@@ -96,8 +97,13 @@ class _TryingToConceiveSetupPageState
       }
     } catch (e) {
       if (mounted) {
+        final languageCode = ref.read(languageProvider);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving setup: $e')),
+          SnackBar(
+            content: Text(
+              '${'ttc.error_saving_setup'.tr(languageCode)} $e',
+            ),
+          ),
         );
       }
     } finally {
@@ -107,9 +113,11 @@ class _TryingToConceiveSetupPageState
 
   @override
   Widget build(BuildContext context) {
+    final languageCode = ref.watch(languageProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fertility Setup'),
+        title: const Tr('ttc.app_bar_title'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -128,17 +136,16 @@ class _TryingToConceiveSetupPageState
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(height: 24),
-                      Text(
-                        'Trying to Conceive',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      const Tr(
+                        'ttc.title',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
-                      Text(
-                        'Provide your cycle details to personalize your fertility tracking experience.',
+                      Tr(
+                        'ttc.description',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -155,14 +162,14 @@ class _TryingToConceiveSetupPageState
                 onTap: () => _selectLmpDate(context),
                 borderRadius: BorderRadius.circular(12),
                 child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Last Menstrual Period Start Date',
-                    prefixIcon: Icon(Icons.calendar_today_outlined),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'ttc.lmp_label'.tr(languageCode),
+                    prefixIcon: const Icon(Icons.calendar_today_outlined),
+                    border: const OutlineInputBorder(),
                   ),
                   child: Text(
                     _lmpDate == null
-                        ? 'Select Date'
+                        ? 'ttc.select_date'.tr(languageCode)
                         : DateFormat('MMMM dd, yyyy').format(_lmpDate!),
                     style: TextStyle(
                       color: _lmpDate == null
@@ -176,19 +183,18 @@ class _TryingToConceiveSetupPageState
               TextField(
                 controller: _cycleLengthController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Average Cycle Length (days)',
-                  prefixIcon: Icon(Icons.timelapse_outlined),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'ttc.cycle_length_label'.tr(languageCode),
+                  prefixIcon: const Icon(Icons.timelapse_outlined),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 24),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 value: _cycleRegular,
-                title: const Text('Cycle Regularity'),
-                subtitle:
-                    const Text('Turn off if your cycles vary significantly'),
+                title: Tr('ttc.cycle_regularity'),
+                subtitle: Tr('ttc.cycle_regularity_subtitle'),
                 onChanged: (val) => setState(() => _cycleRegular = val),
               ),
               const SizedBox(height: 48),
@@ -201,7 +207,7 @@ class _TryingToConceiveSetupPageState
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('Complete Setup'),
+                    : const Tr('ttc.complete_setup'),
               ),
             ],
           ),

@@ -24,24 +24,10 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reminders'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_active),
-            tooltip: 'Test Notification',
-            onPressed: () async {
-              await NotificationService.showInstantNotification(
-                id: 999,
-                title: 'System Active 🚀',
-                body: 'Your notification system is working perfectly.',
-              );
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Test notification sent!')),
-                );
-              }
-            },
-          ),
-        ],
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: reminderRepo.when(
         data: (repo) {
@@ -53,61 +39,73 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
               // Smart Reminders Section
               smartRemindersAsync.when(
                 data: (smartList) {
-                  if (smartList.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  if (smartList.isEmpty)
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
                   return SliverMainAxisGroup(
                     slivers: [
-                       SliverToBoxAdapter(
-                         child: Padding(
-                           padding: const EdgeInsets.all(16.0),
-                           child: Row(
-                             children: [
-                               Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.tertiary),
-                               const SizedBox(width: 8),
-                               Text(
-                                 'Smart Suggestions',
-                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                   fontWeight: FontWeight.bold,
-                                   color: Theme.of(context).colorScheme.tertiary,
-                                 ),
-                               ),
-                             ],
-                           ),
-                         ),
-                       ),
-                       SliverList(
-                         delegate: SliverChildBuilderDelegate(
-                           (context, index) {
-                             final reminder = smartList[index];
-                             return Padding(
-                               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                               child: SmartReminderCard(
-                                 reminder: reminder,
-                                 onDismiss: () {
-                                   // In a real app, we'd blacklist this ID in a persistent store
-                                   // For now, we unfortunately can't modify the provider's state easily without a notifier
-                                   // Or we save it as "completed" to local repo immediately?
-                                   // Let's just visually remove by saving it as completed/dismissed to local repo
-                                   // so it doesn't show up again? Or separate blacklist.
-                                   // Creating a manual entry marked as completed/ignored is a safe bet.
-                                 },
-                                 onComplete: () async {
-                                    // Save to local repo as done
-                                    final completed = reminder.copyWith(isCompleted: true);
-                                    await repo.saveReminder(completed);
-                                    // Refresh logic might be needed
-                                 },
-                               ),
-                             );
-                           },
-                           childCount: smartList.length,
-                         ),
-                       ),
-                       const SliverToBoxAdapter(child: Divider(height: 32)),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.auto_awesome,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Smart Suggestions',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final reminder = smartList[index];
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: SmartReminderCard(
+                                reminder: reminder,
+                                onDismiss: () {
+                                  // In a real app, we'd blacklist this ID in a persistent store
+                                  // For now, we unfortunately can't modify the provider's state easily without a notifier
+                                  // Or we save it as "completed" to local repo immediately?
+                                  // Let's just visually remove by saving it as completed/dismissed to local repo
+                                  // so it doesn't show up again? Or separate blacklist.
+                                  // Creating a manual entry marked as completed/ignored is a safe bet.
+                                },
+                                onComplete: () async {
+                                  // Save to local repo as done
+                                  final completed =
+                                      reminder.copyWith(isCompleted: true);
+                                  await repo.saveReminder(completed);
+                                  // Refresh logic might be needed
+                                },
+                              ),
+                            );
+                          },
+                          childCount: smartList.length,
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: Divider(height: 32)),
                     ],
                   );
                 },
-                loading: () => const SliverToBoxAdapter(child: LinearProgressIndicator()),
-                error: (e,s) => SliverToBoxAdapter(child: Text('Error loading smart reminders: $e')),
+                loading: () =>
+                    const SliverToBoxAdapter(child: LinearProgressIndicator()),
+                error: (e, s) => SliverToBoxAdapter(
+                    child: Text('Error loading smart reminders: $e')),
               ),
 
               // Today's Reminders
@@ -119,13 +117,17 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                       children: [
                         Icon(
                           Icons.today,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                         const SizedBox(width: 12),
                         Text(
                           'Today\'s Tasks',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                         ),
                       ],
@@ -137,7 +139,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                     (context, index) {
                       final reminder = todayReminders[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 4),
                         child: _ReminderCard(reminder: reminder, repo: repo),
                       );
                     },
@@ -148,18 +151,20 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
 
               // Upcoming Reminders
               if (upcomingReminders.isNotEmpty) ...[
-                 SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        Icon(Icons.upcoming, color: Theme.of(context).colorScheme.secondary),
+                        Icon(Icons.upcoming,
+                            color: Theme.of(context).colorScheme.secondary),
                         const SizedBox(width: 12),
                         Text(
                           'Upcoming',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                       ],
                     ),
@@ -170,7 +175,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                     (context, index) {
                       final reminder = upcomingReminders[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 4),
                         child: _ReminderCard(reminder: reminder, repo: repo),
                       );
                     },
@@ -178,19 +184,20 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                   ),
                 ),
               ],
-              
+
               if (todayReminders.isEmpty && upcomingReminders.isEmpty)
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(32.0),
-                    child: Center(child: Text("No manual reminders set.")),
+                    child: Center(child: Text('No manual reminders set.')),
                   ),
                 ),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: ${error.toString()}')),
+        error: (error, stack) =>
+            Center(child: Text('Error: ${error.toString()}')),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddReminderDialog(context),
@@ -229,9 +236,15 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: selectedType,
+                  initialValue: selectedType,
                   decoration: const InputDecoration(labelText: 'Type'),
-                  items: ['General', 'Feeding', 'Sleep', 'Medical', 'Vaccination'].map((type) {
+                  items: [
+                    'General',
+                    'Feeding',
+                    'Sleep',
+                    'Medical',
+                    'Vaccination'
+                  ].map((type) {
                     return DropdownMenuItem(value: type, child: Text(type));
                   }).toList(),
                   onChanged: (value) {
@@ -244,7 +257,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                 ListTile(
                   leading: const Icon(Icons.calendar_today),
                   title: const Text('Select Date'),
-                  subtitle: Text(DateFormat('MMM dd, yyyy').format(selectedDate)),
+                  subtitle:
+                      Text(DateFormat('MMM dd, yyyy').format(selectedDate)),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -289,7 +303,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                 }
 
                 try {
-                  final repo = await ref.read(reminderRepositoryProvider.future);
+                  final repo =
+                      await ref.read(reminderRepositoryProvider.future);
                   final scheduledTime = DateTime(
                     selectedDate.year,
                     selectedDate.month,
@@ -308,7 +323,8 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
                     type: selectedType,
                   );
 
-                  final updatedReminder = await ReminderService.scheduleDailyReminders(reminder);
+                  final updatedReminder =
+                      await ReminderService.scheduleDailyReminders(reminder);
                   await repo.saveReminder(updatedReminder);
 
                   if (mounted) {
@@ -347,7 +363,7 @@ class _ReminderCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       color: reminder.isCompleted
-          ? Theme.of(context).colorScheme.surfaceVariant
+          ? Theme.of(context).colorScheme.surfaceContainerHighest
           : null,
       child: CheckboxListTile(
         value: reminder.isCompleted,
@@ -361,7 +377,8 @@ class _ReminderCard extends ConsumerWidget {
         title: Text(
           reminder.title,
           style: TextStyle(
-            decoration: reminder.isCompleted ? TextDecoration.lineThrough : null,
+            decoration:
+                reminder.isCompleted ? TextDecoration.lineThrough : null,
           ),
         ),
         subtitle: Column(
@@ -370,16 +387,22 @@ class _ReminderCard extends ConsumerWidget {
             Text(reminder.description),
             const SizedBox(height: 4),
             Text(
-              DateFormat('MMM dd, yyyy • hh:mm a').format(reminder.scheduledTime),
+              DateFormat('MMM dd, yyyy • hh:mm a')
+                  .format(reminder.scheduledTime),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
                   ),
             ),
           ],
         ),
         secondary: CircleAvatar(
-          backgroundColor: _getColorForType(context, reminder.type).withOpacity(0.2),
-          child: Icon(_getIconForType(reminder.type), color: _getColorForType(context, reminder.type)),
+          backgroundColor:
+              _getColorForType(context, reminder.type).withOpacity(0.2),
+          child: Icon(_getIconForType(reminder.type),
+              color: _getColorForType(context, reminder.type)),
         ),
         controlAffinity: ListTileControlAffinity.leading,
       ),

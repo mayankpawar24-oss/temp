@@ -12,22 +12,27 @@ import 'package:uuid/uuid.dart';
 
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final userProfile = ref.watch(userProfileProvider);
-  
-  String instruction = "You are a helpful maternal and infant care assistant.";
+
+  String instruction = 'You are a helpful maternal and infant care assistant.';
   if (userProfile == UserProfileType.pregnant) {
-    instruction += " The user is currently pregnant. Provide advice relevant to pregnancy.";
+    instruction +=
+        ' The user is currently pregnant. Provide advice relevant to pregnancy.';
   } else if (userProfile == UserProfileType.tryingToConceive) {
-    instruction += " The user is trying to conceive. Provide fertility, ovulation, and cycle-tracking guidance.";
+    instruction +=
+        ' The user is trying to conceive. Provide fertility, ovulation, and cycle-tracking guidance.';
   } else if (userProfile == UserProfileType.toddlerParent) {
-    instruction += " The user is a parent of a toddler. Provide advice relevant to parenting a toddler.";
+    instruction +=
+        ' The user is a parent of a toddler. Provide advice relevant to parenting a toddler.';
   }
-  
-  instruction += " Do not prescribe medical treatments. Always advise consulting a healthcare professional for medical issues. If the query is not related to maternal or infant care, politely guide the user back to the topic.";
+
+  instruction +=
+      ' Do not prescribe medical treatments. Always advise consulting a healthcare professional for medical issues. If the query is not related to maternal or infant care, politely guide the user back to the topic.';
 
   return GeminiService(systemInstruction: instruction);
 });
 
-final aiResponseProvider = StateNotifierProvider<AiChatNotifier, List<ChatMessage>>((ref) {
+final aiResponseProvider =
+    StateNotifierProvider<AiChatNotifier, List<ChatMessage>>((ref) {
   final service = ref.watch(geminiServiceProvider);
   final repoAsync = ref.watch(chatHistoryRepositoryProvider);
   return AiChatNotifier(service, repoAsync.value, ref);
@@ -75,7 +80,7 @@ class AiChatNotifier extends StateNotifier<List<ChatMessage>> {
     // Optionally load last session or start new?
     // For now, let's start fresh.
   }
-  
+
   void startNewSession() {
     currentSessionId = null;
     state = [];
@@ -85,24 +90,26 @@ class AiChatNotifier extends StateNotifier<List<ChatMessage>> {
 
   Future<void> loadSession(String sessionId) async {
     if (_repository == null) return;
-    
+
     final session = _repository!.getSession(sessionId);
     if (session != null) {
       currentSessionId = sessionId;
-      
+
       // Convert Hive models to UI models
-      final messages = session.messages.map((m) => ChatMessage(
-        text: m.text,
-        isUser: m.isUser,
-        timestamp: m.timestamp,
-      )).toList();
-      
+      final messages = session.messages
+          .map((m) => ChatMessage(
+                text: m.text,
+                isUser: m.isUser,
+                timestamp: m.timestamp,
+              ))
+          .toList();
+
       state = messages;
-      
+
       // Initialize Gemini context
       final contentHistory = messages.map((msg) {
-          return Content(msg.isUser ? 'user' : 'model', [TextPart(msg.text)]);
-        }).toList();
+        return Content(msg.isUser ? 'user' : 'model', [TextPart(msg.text)]);
+      }).toList();
       _service.initializeSession(contentHistory);
       _ref.invalidate(chatSessionsProvider);
     }
@@ -113,23 +120,25 @@ class AiChatNotifier extends StateNotifier<List<ChatMessage>> {
 
     // Create session ID if new
     currentSessionId ??= const Uuid().v4();
-    
+
     // Determine title (first user message or "New Chat")
-    String title = "New Chat";
+    String title = 'New Chat';
     final firstUserMsg = state.where((m) => m.isUser).firstOrNull;
     if (firstUserMsg != null) {
-      title = firstUserMsg.text.length > 30 
-          ? '${firstUserMsg.text.substring(0, 30)}...' 
+      title = firstUserMsg.text.length > 30
+          ? '${firstUserMsg.text.substring(0, 30)}...'
           : firstUserMsg.text;
     }
 
     // Convert UI models to Hive models
-    final hiveMessages = state.map((m) => ChatMessageModel(
-      id: const Uuid().v4(), // Generate ID for message
-      text: m.text,
-      isUser: m.isUser,
-      timestamp: m.timestamp,
-    )).toList();
+    final hiveMessages = state
+        .map((m) => ChatMessageModel(
+              id: const Uuid().v4(), // Generate ID for message
+              text: m.text,
+              isUser: m.isUser,
+              timestamp: m.timestamp,
+            ))
+        .toList();
 
     final session = ChatSessionModel(
       id: currentSessionId!,
@@ -148,16 +157,16 @@ class AiChatNotifier extends StateNotifier<List<ChatMessage>> {
       isUser: true,
       timestamp: DateTime.now(),
     );
-    
+
     state = [...state, userMessage];
 
     final response = await _service.sendMessage(text);
 
-    final isError = response.startsWith('Error:') || 
-                    response.startsWith('Rate limit') || 
-                    response.startsWith('API key') ||
-                    response.startsWith('Network error') ||
-                    response.startsWith('Sorry, I encountered an error');
+    final isError = response.startsWith('Error:') ||
+        response.startsWith('Rate limit') ||
+        response.startsWith('API key') ||
+        response.startsWith('Network error') ||
+        response.startsWith('Sorry, I encountered an error');
 
     final aiMessage = ChatMessage(
       text: response,
@@ -167,7 +176,7 @@ class AiChatNotifier extends StateNotifier<List<ChatMessage>> {
     );
 
     state = [...state, aiMessage];
-    
+
     // Save to Hive
     await _saveCurrentSession();
   }

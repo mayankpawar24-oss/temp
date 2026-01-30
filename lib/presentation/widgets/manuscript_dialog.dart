@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maternal_infant_care/core/theme/app_theme.dart';
 
 class ManuscriptDialog extends StatelessWidget {
   final String title;
@@ -25,9 +23,11 @@ class ManuscriptDialog extends StatelessWidget {
 }
 
 // Global Help Method
-void showManuscriptDialog(BuildContext context, {required String title, required Widget content, List<Widget>? actions}) {
+void showManuscriptDialog(BuildContext context,
+    {required String title, required Widget content, List<Widget>? actions}) {
   showDialog(
     context: context,
-    builder: (context) => ManuscriptDialog(title: title, content: content, actions: actions),
+    builder: (context) =>
+        ManuscriptDialog(title: title, content: content, actions: actions),
   );
 }
