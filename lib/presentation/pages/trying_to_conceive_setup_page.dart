@@ -193,8 +193,8 @@ class _TryingToConceiveSetupPageState
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 value: _cycleRegular,
-                title: Tr('ttc.cycle_regularity'),
-                subtitle: Tr('ttc.cycle_regularity_subtitle'),
+                title: const Tr('ttc.cycle_regularity'),
+                subtitle: const Tr('ttc.cycle_regularity_subtitle'),
                 onChanged: (val) => setState(() => _cycleRegular = val),
               ),
               const SizedBox(height: 48),

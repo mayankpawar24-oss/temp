@@ -151,7 +151,7 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
         // Baby Kicks Analysis
         kickRepo.when(
           data: (repo) {
-            final allKicks = repo.getHistory() as List<KickLogModel>;
+            final allKicks = repo.getHistory();
             final weeklyKicks = <double>[];
             for (int i = 0; i < 7; i++) {
               final date = _weekStart.add(Duration(days: i));
@@ -178,8 +178,7 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
         // Contractions Analysis
         contractionRepo.when(
           data: (repo) {
-            final allContractions =
-                repo.getContractions() as List<ContractionModel>;
+            final allContractions = repo.getContractions();
             final weeklyContractions = <double>[];
             for (int i = 0; i < 7; i++) {
               final date = _weekStart.add(Duration(days: i));
@@ -308,7 +307,7 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
           const SizedBox(height: 20),
           kickRepo.when(
             data: (kickRepoData) {
-              final allKicks = kickRepoData.getHistory() as List<KickLogModel>;
+              final allKicks = kickRepoData.getHistory();
               final weeklyKicks = allKicks.where((k) {
                 final daysDiff = k.sessionStart.difference(_weekStart).inDays;
                 return daysDiff >= 0 && daysDiff < 7;
@@ -334,8 +333,7 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
           const SizedBox(height: 16),
           contractionRepo.when(
             data: (contractionRepoData) {
-              final allContractions = contractionRepoData.getContractions()
-                  as List<ContractionModel>;
+              final allContractions = contractionRepoData.getContractions();
               final weeklyContractions = allContractions.where((c) {
                 final daysDiff = c.startTime.difference(_weekStart).inDays;
                 return daysDiff >= 0 && daysDiff < 7;

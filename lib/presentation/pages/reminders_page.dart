@@ -39,8 +39,9 @@ class _RemindersPageState extends ConsumerState<RemindersPage> {
               // Smart Reminders Section
               smartRemindersAsync.when(
                 data: (smartList) {
-                  if (smartList.isEmpty)
+                  if (smartList.isEmpty) {
                     return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  }
                   return SliverMainAxisGroup(
                     slivers: [
                       SliverToBoxAdapter(

@@ -21,8 +21,9 @@ class TranslationRepository {
     String sourceLanguage = 'en',
   }) async {
     if (text.isEmpty) return text;
-    if (targetLanguage == 'en')
+    if (targetLanguage == 'en') {
       return text; // No translation needed for English
+    }
 
     try {
       final requestBody = {

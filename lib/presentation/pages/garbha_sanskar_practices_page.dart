@@ -35,10 +35,10 @@ class GarbhaSanskarPracticesPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Mind & Emotions Category
-            _CategorySection(
+            const _CategorySection(
               title: 'Mind & Emotions',
               icon: Icons.psychology,
-              color: const Color(0xFF800000),
+              color: Color(0xFF800000),
               practices: [
                 _Practice(
                   title: 'Morning Meditation',
@@ -65,10 +65,10 @@ class GarbhaSanskarPracticesPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Environment Category
-            _CategorySection(
+            const _CategorySection(
               title: 'Environment',
               icon: Icons.nature,
-              color: const Color(0xFFDAA520),
+              color: Color(0xFFDAA520),
               practices: [
                 _Practice(
                   title: 'Calming Spaces',
@@ -96,10 +96,10 @@ class GarbhaSanskarPracticesPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Reflection & Routine Category
-            _CategorySection(
+            const _CategorySection(
               title: 'Reflection & Routine',
               icon: Icons.book,
-              color: const Color(0xFFCD853F),
+              color: Color(0xFFCD853F),
               practices: [
                 _Practice(
                   title: 'Reading Uplifting Stories',

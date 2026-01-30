@@ -238,9 +238,9 @@ class _WeeklyContentCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.auto_awesome,
-                    color: const Color(0xFF800000),
+                    color: Color(0xFF800000),
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -292,9 +292,9 @@ class _WeeklyContentCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.menu_book,
-                    color: const Color(0xFFDAA520),
+                    color: Color(0xFFDAA520),
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -336,9 +336,9 @@ class _WeeklyContentCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.check_circle_outline,
-                    color: const Color(0xFFCD853F),
+                    color: Color(0xFFCD853F),
                     size: 24,
                   ),
                   const SizedBox(width: 12),
@@ -362,8 +362,8 @@ class _WeeklyContentCard extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 4),
                         width: 6,
                         height: 6,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFCD853F),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFCD853F),
                           shape: BoxShape.circle,
                         ),
                       ),

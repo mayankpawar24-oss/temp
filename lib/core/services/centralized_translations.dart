@@ -110,7 +110,7 @@ class AppTranslations {
       print('✅ Translation complete for $targetLanguage!');
       print(
           '   Cached ${_translatedCache[targetLanguage]!.length} translations');
-      final sampleKey = 'profile.title';
+      const sampleKey = 'profile.title';
       if (_translatedCache[targetLanguage]!.containsKey(sampleKey)) {
         print(
             '   Sample: $sampleKey = ${_translatedCache[targetLanguage]![sampleKey]}');

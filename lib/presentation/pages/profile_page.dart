@@ -146,7 +146,7 @@ class ProfilePage extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     title: const Tr('profile.language'),
-                    subtitle: Text('${currentLanguage.nativeName}'),
+                    subtitle: Text(currentLanguage.nativeName),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       _showLanguageDialog(context, ref, currentLanguage);
@@ -218,7 +218,7 @@ class ProfilePage extends ConsumerWidget {
                               Container(
                                 width: 8,
                                 height: 8,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.orange,
                                   shape: BoxShape.circle,
                                 ),

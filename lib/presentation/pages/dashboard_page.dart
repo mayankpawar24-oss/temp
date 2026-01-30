@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maternal_infant_care/core/theme/app_theme.dart';
 import 'package:maternal_infant_care/core/services/centralized_translations.dart';
-import 'package:maternal_infant_care/data/models/pregnancy_model.dart';
-import 'package:maternal_infant_care/data/models/feeding_model.dart';
-import 'package:maternal_infant_care/data/models/sleep_model.dart';
-import 'package:maternal_infant_care/data/models/vaccination_model.dart';
-import 'package:maternal_infant_care/data/models/reminder_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
 import 'package:maternal_infant_care/core/utils/notification_service.dart';
-import 'package:maternal_infant_care/presentation/pages/pregnancy_tracking_page.dart';
 import 'package:maternal_infant_care/presentation/pages/feeding_tracking_page.dart';
 import 'package:maternal_infant_care/presentation/pages/sleep_tracking_page.dart';
 import 'package:maternal_infant_care/presentation/pages/growth_tracking_page.dart';
@@ -21,8 +13,6 @@ import 'package:maternal_infant_care/presentation/pages/nutrition_guidance_page.
 import 'package:maternal_infant_care/presentation/pages/disease_awareness_page.dart';
 import 'package:maternal_infant_care/presentation/pages/reminders_page.dart';
 import 'package:maternal_infant_care/presentation/pages/diaper_tracking_page.dart';
-import 'package:maternal_infant_care/presentation/pages/diaper_tracking_page.dart';
-import 'package:maternal_infant_care/presentation/widgets/manuscript_dialog.dart';
 import 'package:maternal_infant_care/presentation/pages/careflow_ai_page.dart';
 
 import 'package:maternal_infant_care/presentation/pages/profile_page.dart';

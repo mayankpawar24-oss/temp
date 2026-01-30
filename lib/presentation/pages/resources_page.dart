@@ -96,8 +96,9 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
                           (context, index) {
                             // Build rows of 2 items each
                             final startIndex = index * 2;
-                            if (startIndex >= filteredArticles.length)
+                            if (startIndex >= filteredArticles.length) {
                               return null;
+                            }
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 16),

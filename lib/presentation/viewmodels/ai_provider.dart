@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:maternal_infant_care/domain/services/gemini_service.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
