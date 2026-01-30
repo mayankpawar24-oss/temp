@@ -1,9 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserProfileRepository {
-  UserProfileRepository({SupabaseClient? client}) : _client = client ?? Supabase.instance.client;
+  UserProfileRepository({SupabaseClient? client})
+      : _client = client ?? _tryGetClient();
 
-  final SupabaseClient _client;
+  final SupabaseClient? _client;
 
   Future<void> upsertProfile({
     required String userId,
@@ -11,11 +12,20 @@ class UserProfileRepository {
     required String role,
     required String profileType,
   }) async {
-    await _client.from('profiles').upsert({
+    if (_client == null) return;
+    await _client!.from('profiles').upsert({
       'id': userId,
       'email': email,
       'role': role,
       'profile_type': profileType,
     });
+  }
+
+  static SupabaseClient? _tryGetClient() {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
   }
 }

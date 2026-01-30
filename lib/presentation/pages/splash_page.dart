@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maternal_infant_care/core/constants/env.dart';
 import 'package:maternal_infant_care/presentation/pages/onboarding_page.dart';
 import 'package:maternal_infant_care/presentation/pages/main_navigation_shell.dart';
 
@@ -31,14 +32,21 @@ class _SplashPageState extends ConsumerState<SplashPage>
     _navigateToNext();
   }
 
-
-
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       // Check if user is logged in
-      final currentUser = Supabase.instance.client.auth.currentUser;
-      
+      final hasSupabase =
+          Env.supabaseUrl.isNotEmpty && Env.supabaseAnonKey.isNotEmpty;
+      User? currentUser;
+      if (hasSupabase) {
+        try {
+          currentUser = Supabase.instance.client.auth.currentUser;
+        } catch (_) {
+          currentUser = null;
+        }
+      }
+
       Widget nextPage;
       if (currentUser != null) {
         // User is logged in, go to main app
@@ -47,7 +55,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
         // No user, go to onboarding
         nextPage = const OnboardingPage();
       }
-      
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => nextPage,
@@ -102,17 +110,17 @@ class _SplashPageState extends ConsumerState<SplashPage>
               Text(
                 'Vatsalya',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onBackground,
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
                 'Nurturing Growth, Daily.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                 textAlign: TextAlign.center,
               ),
             ],

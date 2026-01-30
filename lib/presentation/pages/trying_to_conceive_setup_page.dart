@@ -10,10 +10,12 @@ class TryingToConceiveSetupPage extends ConsumerStatefulWidget {
   const TryingToConceiveSetupPage({super.key});
 
   @override
-  ConsumerState<TryingToConceiveSetupPage> createState() => _TryingToConceiveSetupPageState();
+  ConsumerState<TryingToConceiveSetupPage> createState() =>
+      _TryingToConceiveSetupPageState();
 }
 
-class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetupPage> {
+class _TryingToConceiveSetupPageState
+    extends ConsumerState<TryingToConceiveSetupPage> {
   DateTime? _lmpDate;
   bool _cycleRegular = true;
   bool _isLoading = false;
@@ -51,7 +53,9 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
 
     if (cycleLength < 20 || cycleLength > 60) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Average cycle length should be between 20 and 60 days.')),
+        const SnackBar(
+            content:
+                Text('Average cycle length should be between 20 and 60 days.')),
       );
       return;
     }
@@ -69,7 +73,7 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
     try {
       final repo = ref.read(fertilityProfileRepositoryProvider);
       final profile = FertilityProfileModel(
-        userId: user.id,
+        userId: user['id'] as String,
         lmpDate: _lmpDate!,
         avgCycleLength: cycleLength,
         cycleRegular: _cycleRegular,
@@ -78,7 +82,9 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
 
       final authService = ref.read(authServiceProvider);
       await authService.updateUserMetadata({
-        'start_date': DateTime.utc(_lmpDate!.year, _lmpDate!.month, _lmpDate!.day).toIso8601String(),
+        'start_date':
+            DateTime.utc(_lmpDate!.year, _lmpDate!.month, _lmpDate!.day)
+                .toIso8601String(),
       });
 
       ref.read(authStateProvider.notifier).setUser(authService.currentUser);
@@ -124,16 +130,19 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
                       const SizedBox(height: 24),
                       Text(
                         'Trying to Conceive',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'Provide your cycle details to personalize your fertility tracking experience.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -178,7 +187,8 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
                 contentPadding: EdgeInsets.zero,
                 value: _cycleRegular,
                 title: const Text('Cycle Regularity'),
-                subtitle: const Text('Turn off if your cycles vary significantly'),
+                subtitle:
+                    const Text('Turn off if your cycles vary significantly'),
                 onChanged: (val) => setState(() => _cycleRegular = val),
               ),
               const SizedBox(height: 48),
@@ -188,7 +198,8 @@ class _TryingToConceiveSetupPageState extends ConsumerState<TryingToConceiveSetu
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Text('Complete Setup'),
               ),

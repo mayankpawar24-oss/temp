@@ -1,20 +1,25 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
-  AuthService({SupabaseClient? client}) : _client = client ?? Supabase.instance.client;
+  AuthService({SupabaseClient? client}) : _client = client ?? _tryGetClient();
 
-  final SupabaseClient _client;
+  final SupabaseClient? _client;
 
-  Map<String, dynamic>? get currentUser => _mapUser(_client.auth.currentUser);
+  bool get isAvailable => _client != null;
 
-  Map<String, dynamic> get userMetadata => _client.auth.currentUser?.userMetadata ?? {};
+  Map<String, dynamic>? get currentUser =>
+      _client == null ? null : _mapUser(_client!.auth.currentUser);
+
+  Map<String, dynamic> get userMetadata =>
+      _client?.auth.currentUser?.userMetadata ?? {};
 
   Future<bool> signUp({
     required String email,
     required String password,
     Map<String, dynamic>? data,
   }) async {
-    final response = await _client.auth.signUp(
+    if (_client == null) return false;
+    final response = await _client!.auth.signUp(
       email: email,
       password: password,
       data: data,
@@ -22,8 +27,10 @@ class AuthService {
     return response.user != null;
   }
 
-  Future<bool> signInWithEmailAndPassword({required String email, required String password}) async {
-    final response = await _client.auth.signInWithPassword(
+  Future<bool> signInWithEmailAndPassword(
+      {required String email, required String password}) async {
+    if (_client == null) return false;
+    final response = await _client!.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -31,21 +38,32 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await _client.auth.signOut();
+    if (_client == null) return;
+    await _client!.auth.signOut();
   }
 
   Future<bool> updateUserMetadata(Map<String, dynamic> data) async {
-    final response = await _client.auth.updateUser(
+    if (_client == null) return false;
+    final response = await _client!.auth.updateUser(
       UserAttributes(data: data),
     );
     return response.user != null;
   }
 
   Future<bool> updatePassword(String newPassword) async {
-    final response = await _client.auth.updateUser(
+    if (_client == null) return false;
+    final response = await _client!.auth.updateUser(
       UserAttributes(password: newPassword),
     );
     return response.user != null;
+  }
+
+  static SupabaseClient? _tryGetClient() {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
   }
 
   Map<String, dynamic>? _mapUser(User? user) {

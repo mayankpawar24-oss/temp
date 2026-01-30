@@ -38,7 +38,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -46,7 +49,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     if (password != confirmPassword) {
-       ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
       );
       return;
@@ -79,15 +82,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       // Update local provider state
       ref.read(userProfileProvider.notifier).state = _selectedProfileType;
 
-      final supabaseUser = Supabase.instance.client.auth.currentUser;
-      if (supabaseUser != null) {
-        final profileRepo = ref.read(userProfileRepositoryProvider);
-        await profileRepo.upsertProfile(
-          userId: supabaseUser.id,
-          email: supabaseUser.email ?? email,
-          role: role,
-          profileType: role,
-        );
+      if (authService.isAvailable) {
+        final currentUser = authService.currentUser;
+        if (currentUser != null) {
+          final profileRepo = ref.read(userProfileRepositoryProvider);
+          await profileRepo.upsertProfile(
+            userId: currentUser['id'] as String,
+            email: (currentUser['email'] as String?) ?? email,
+            role: role,
+            profileType: role,
+          );
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -118,7 +123,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       if (!mounted) return;
       String errorMessage = 'Registration failed';
       if (e.message.contains('already registered')) {
-        errorMessage = 'Email already registered. Please try logging in instead.';
+        errorMessage =
+            'Email already registered. Please try logging in instead.';
       } else if (e.message.contains('weak password')) {
         errorMessage = 'Password is too weak. Use at least 6 characters.';
       } else if (e.message.contains('invalid email')) {
@@ -132,7 +138,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: ${e.toString()}'), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text('Registration failed: ${e.toString()}'),
+            backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
@@ -216,7 +224,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceVariant
+                      .withOpacity(0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -264,7 +275,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('Create Account'),
                 ),
@@ -305,7 +317,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outlineVariant,
           ),
         ),
         child: Padding(
@@ -315,12 +329,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceVariant,
+                  color: isSelected
+                      ? theme.colorScheme.primaryContainer
+                      : theme.colorScheme.surfaceVariant,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 16),

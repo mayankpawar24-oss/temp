@@ -17,13 +17,15 @@ import 'package:maternal_infant_care/data/repositories/user_profile_repository.d
 import 'package:maternal_infant_care/data/models/fertility_profile_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/auth_provider.dart';
 
-final pregnancyRepositoryProvider = FutureProvider<PregnancyRepository>((ref) async {
+final pregnancyRepositoryProvider =
+    FutureProvider<PregnancyRepository>((ref) async {
   final repo = PregnancyRepository();
   await repo.init();
   return repo;
 });
 
-final feedingRepositoryProvider = FutureProvider<FeedingRepository>((ref) async {
+final feedingRepositoryProvider =
+    FutureProvider<FeedingRepository>((ref) async {
   final repo = FeedingRepository();
   await repo.init();
   return repo;
@@ -41,19 +43,22 @@ final growthRepositoryProvider = FutureProvider<GrowthRepository>((ref) async {
   return repo;
 });
 
-final vaccinationRepositoryProvider = FutureProvider<VaccinationRepository>((ref) async {
+final vaccinationRepositoryProvider =
+    FutureProvider<VaccinationRepository>((ref) async {
   final repo = VaccinationRepository();
   await repo.init();
   return repo;
 });
 
-final medicalRecordRepositoryProvider = FutureProvider<MedicalRecordRepository>((ref) async {
+final medicalRecordRepositoryProvider =
+    FutureProvider<MedicalRecordRepository>((ref) async {
   final repo = MedicalRecordRepository();
   await repo.init();
   return repo;
 });
 
-final reminderRepositoryProvider = FutureProvider<ReminderRepository>((ref) async {
+final reminderRepositoryProvider =
+    FutureProvider<ReminderRepository>((ref) async {
   final repo = ReminderRepository();
   await repo.init();
   return repo;
@@ -65,25 +70,29 @@ final diaperRepositoryProvider = FutureProvider<DiaperRepository>((ref) async {
   return repo;
 });
 
-final dashboardPreferencesProvider = FutureProvider<DashboardPreferencesRepository>((ref) async {
+final dashboardPreferencesProvider =
+    FutureProvider<DashboardPreferencesRepository>((ref) async {
   final repo = DashboardPreferencesRepository();
   await repo.init();
   return repo;
 });
 
-final kickLogRepositoryProvider = FutureProvider<KickLogRepository>((ref) async {
+final kickLogRepositoryProvider =
+    FutureProvider<KickLogRepository>((ref) async {
   final repo = KickLogRepository();
   await repo.init();
   return repo;
 });
 
-final contractionRepositoryProvider = FutureProvider<ContractionRepository>((ref) async {
+final contractionRepositoryProvider =
+    FutureProvider<ContractionRepository>((ref) async {
   final repo = ContractionRepository();
   await repo.init();
   return repo;
 });
 
-final milestoneRepositoryProvider = FutureProvider<MilestoneRepository>((ref) async {
+final milestoneRepositoryProvider =
+    FutureProvider<MilestoneRepository>((ref) async {
   final repo = MilestoneRepository();
   await repo.init();
   await repo.initializeDefaults();
@@ -91,13 +100,15 @@ final milestoneRepositoryProvider = FutureProvider<MilestoneRepository>((ref) as
   return repo;
 });
 
-final chatHistoryRepositoryProvider = FutureProvider<ChatHistoryRepository>((ref) async {
+final chatHistoryRepositoryProvider =
+    FutureProvider<ChatHistoryRepository>((ref) async {
   final repo = ChatHistoryRepository();
   await repo.init();
   return repo;
 });
 
-final fertilityProfileRepositoryProvider = Provider<FertilityProfileRepository>((ref) {
+final fertilityProfileRepositoryProvider =
+    Provider<FertilityProfileRepository>((ref) {
   return FertilityProfileRepository();
 });
 
@@ -105,11 +116,12 @@ final userProfileRepositoryProvider = Provider<UserProfileRepository>((ref) {
   return UserProfileRepository();
 });
 
-final fertilityProfileProvider = FutureProvider<FertilityProfileModel?>((ref) async {
+final fertilityProfileProvider =
+    FutureProvider<FertilityProfileModel?>((ref) async {
   final user = ref.watch(currentUserProvider);
   if (user == null) return null;
   final repo = ref.watch(fertilityProfileRepositoryProvider);
-  return repo.fetchProfile(user.id);
+  return repo.fetchProfile(user['id'] as String);
 });
 
 final chatSessionsProvider = FutureProvider((ref) async {

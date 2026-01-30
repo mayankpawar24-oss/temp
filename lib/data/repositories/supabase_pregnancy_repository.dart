@@ -3,13 +3,14 @@ import 'package:maternal_infant_care/data/models/pregnancy_model.dart';
 
 class SupabasePregnancyRepository {
   SupabasePregnancyRepository({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+      : _client = client ?? _tryGetClient();
 
-  final SupabaseClient _client;
+  final SupabaseClient? _client;
   static const String _tableName = 'pregnancies';
 
   Future<void> savePregnancy(PregnancyModel pregnancy) async {
-    final userId = _client.auth.currentUser?.id;
+    if (_client == null) return;
+    final userId = _client!.auth.currentUser?.id;
     if (userId == null) throw Exception('User not authenticated');
 
     final data = {
@@ -25,14 +26,14 @@ class SupabasePregnancyRepository {
     };
 
     // Try to update first, if no rows affected, insert
-    final result = await _client
+    final result = await _client!
         .from(_tableName)
         .update(data)
         .eq('user_id', userId)
         .select();
 
     if (result.isEmpty) {
-      await _client.from(_tableName).insert({
+      await _client!.from(_tableName).insert({
         ...data,
         'id': pregnancy.id,
       });
@@ -40,11 +41,12 @@ class SupabasePregnancyRepository {
   }
 
   Future<PregnancyModel?> getPregnancy() async {
-    final userId = _client.auth.currentUser?.id;
+    if (_client == null) return null;
+    final userId = _client!.auth.currentUser?.id;
     if (userId == null) return null;
 
     try {
-      final response = await _client
+      final response = await _client!
           .from(_tableName)
           .select()
           .eq('user_id', userId)
@@ -61,17 +63,27 @@ class SupabasePregnancyRepository {
   }
 
   Future<void> deletePregnancy(String id) async {
-    final userId = _client.auth.currentUser?.id;
+    if (_client == null) return;
+    final userId = _client!.auth.currentUser?.id;
     if (userId == null) throw Exception('User not authenticated');
 
-    await _client.from(_tableName).delete().eq('id', id).eq('user_id', userId);
+    await _client!.from(_tableName).delete().eq('id', id).eq('user_id', userId);
   }
 
   Future<void> clearAll() async {
-    final userId = _client.auth.currentUser?.id;
+    if (_client == null) return;
+    final userId = _client!.auth.currentUser?.id;
     if (userId == null) throw Exception('User not authenticated');
 
-    await _client.from(_tableName).delete().eq('user_id', userId);
+    await _client!.from(_tableName).delete().eq('user_id', userId);
+  }
+
+  static SupabaseClient? _tryGetClient() {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      return null;
+    }
   }
 
   PregnancyModel _mapToPregnancyModel(Map<String, dynamic> data) {
@@ -80,10 +92,12 @@ class SupabasePregnancyRepository {
       dueDate: DateTime.parse(data['due_date'] as String),
       lastPeriodDate: DateTime.parse(data['last_period_date'] as String),
       currentMonth: data['current_month'] as int,
-      monthlyChecklists:
-          Map<int, bool>.from(data['monthly_checklists'] as Map<String, dynamic>? ?? {}),
-      completedTests: List<String>.from(data['completed_tests'] as List<dynamic>? ?? []),
-      riskSymptoms: List<String>.from(data['risk_symptoms'] as List<dynamic>? ?? []),
+      monthlyChecklists: Map<int, bool>.from(
+          data['monthly_checklists'] as Map<String, dynamic>? ?? {}),
+      completedTests:
+          List<String>.from(data['completed_tests'] as List<dynamic>? ?? []),
+      riskSymptoms:
+          List<String>.from(data['risk_symptoms'] as List<dynamic>? ?? []),
       createdAt: DateTime.parse(data['created_at'] as String),
       updatedAt: DateTime.parse(data['updated_at'] as String),
     );
