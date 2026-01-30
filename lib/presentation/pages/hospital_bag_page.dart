@@ -9,9 +9,10 @@ class HospitalBagPage extends StatefulWidget {
   State<HospitalBagPage> createState() => _HospitalBagPageState();
 }
 
-class _HospitalBagPageState extends State<HospitalBagPage> with SingleTickerProviderStateMixin {
+class _HospitalBagPageState extends State<HospitalBagPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Map<String, List<BagItem>> _items = {
+  final Map<String, List<BagItem>> _items = {
     'Mom': [
       BagItem(name: 'Birth Plan & Hospital Notes'),
       BagItem(name: 'Loose Comfortable Clothing'),
@@ -75,7 +76,8 @@ class _HospitalBagPageState extends State<HospitalBagPage> with SingleTickerProv
 
   Future<void> _saveItems() async {
     final prefs = await SharedPreferences.getInstance();
-    final data = _items.map((key, value) => MapEntry(key, value.map((e) => {'name': e.name, 'isDone': e.isDone}).toList()));
+    final data = _items.map((key, value) => MapEntry(
+        key, value.map((e) => {'name': e.name, 'isDone': e.isDone}).toList()));
     await prefs.setString('hospital_bag_data', jsonEncode(data));
   }
 
@@ -111,15 +113,20 @@ class _HospitalBagPageState extends State<HospitalBagPage> with SingleTickerProv
                     color: Theme.of(context).cardColor,
                     shape: Theme.of(context).cardTheme.shape,
                     child: CheckboxListTile(
-                      title: Text(
-                        item.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          decoration: item.isDone ? TextDecoration.lineThrough : null,
-                          color: item.isDone 
-                            ? Theme.of(context).disabledColor 
-                            : Theme.of(context).textTheme.titleMedium?.color
-                        )
-                      ),
+                      title: Text(item.name,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                  decoration: item.isDone
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                  color: item.isDone
+                                      ? Theme.of(context).disabledColor
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.color)),
                       value: item.isDone,
                       activeColor: Theme.of(context).colorScheme.primary,
                       checkColor: Theme.of(context).colorScheme.onPrimary,

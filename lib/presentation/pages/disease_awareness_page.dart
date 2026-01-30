@@ -7,7 +7,8 @@ class DiseaseAwarenessPage extends ConsumerStatefulWidget {
   const DiseaseAwarenessPage({super.key});
 
   @override
-  ConsumerState<DiseaseAwarenessPage> createState() => _DiseaseAwarenessPageState();
+  ConsumerState<DiseaseAwarenessPage> createState() =>
+      _DiseaseAwarenessPageState();
 }
 
 class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
@@ -15,14 +16,24 @@ class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
   String selectedCategory = 'All';
   Map<String, dynamic>? selectedDisease;
 
-  final List<String> categories = ['All', 'Common', 'Respiratory', 'Digestive', 'Other'];
+  final List<String> categories = [
+    'All',
+    'Common',
+    'Respiratory',
+    'Digestive',
+    'Other'
+  ];
 
   @override
   Widget build(BuildContext context) {
     final allDiseases = _getCommonDiseases();
     final filteredDiseases = allDiseases.where((disease) {
-      final matchesSearch = disease['name'].toString().toLowerCase().contains(searchQuery.toLowerCase());
-      final matchesCategory = selectedCategory == 'All' || disease['category'] == selectedCategory;
+      final matchesSearch = disease['name']
+          .toString()
+          .toLowerCase()
+          .contains(searchQuery.toLowerCase());
+      final matchesCategory =
+          selectedCategory == 'All' || disease['category'] == selectedCategory;
       return matchesSearch && matchesCategory;
     }).toList();
 
@@ -73,7 +84,8 @@ class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.85,
                       crossAxisSpacing: 16,
@@ -88,7 +100,8 @@ class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DiseaseDetailPage(disease: disease),
+                              builder: (context) =>
+                                  DiseaseDetailPage(disease: disease),
                             ),
                           );
                         },
@@ -108,7 +121,13 @@ class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
         'category': 'Common',
         'icon': Icons.ac_unit,
         'color': const Color(0xFF4FC3F7), // Light Blue
-        'symptoms': ['Runny nose', 'Sneezing', 'Cough', 'Mild fever', 'Irritability'],
+        'symptoms': [
+          'Runny nose',
+          'Sneezing',
+          'Cough',
+          'Mild fever',
+          'Irritability'
+        ],
         'prevention': [
           'Wash hands frequently',
           'Keep baby away from sick people',
@@ -134,7 +153,12 @@ class _DiseaseAwarenessPageState extends ConsumerState<DiseaseAwarenessPage> {
         'category': 'Common',
         'icon': Icons.thermostat,
         'color': const Color(0xFFFFB74D), // Soft Orange
-        'symptoms': ['Elevated body temperature', 'Irritability', 'Decreased appetite', 'Lethargy'],
+        'symptoms': [
+          'Elevated body temperature',
+          'Irritability',
+          'Decreased appetite',
+          'Lethargy'
+        ],
         'prevention': [
           'Maintain good hygiene',
           'Ensure proper vaccination',
@@ -488,7 +512,9 @@ class _DiseaseHubCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+        side: BorderSide(
+            color:
+                Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -663,7 +689,8 @@ class _DetailSection extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.check_circle_outline, size: 16, color: color.withOpacity(0.7)),
+                  Icon(Icons.check_circle_outline,
+                      size: 16, color: color.withOpacity(0.7)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -700,7 +727,7 @@ class _EmergencySection extends StatelessWidget {
           const Row(
             children: [
               Icon(Icons.emergency_rounded, color: Colors.red, size: 24),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Text(
                 'When to See a Doctor',
                 style: TextStyle(
@@ -717,7 +744,8 @@ class _EmergencySection extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 18),
+                    const Icon(Icons.warning_amber_rounded,
+                        color: Colors.red, size: 18),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

@@ -50,12 +50,14 @@ class _SymptomTrackerPageState extends State<SymptomTrackerPage> {
 
   void _addLog(String name, int severity) {
     setState(() {
-      _logs.insert(0, SymptomLog(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: name,
-        severity: severity,
-        timestamp: DateTime.now(),
-      ));
+      _logs.insert(
+          0,
+          SymptomLog(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            name: name,
+            severity: severity,
+            timestamp: DateTime.now(),
+          ));
     });
     _saveLogs();
   }
@@ -73,9 +75,12 @@ class _SymptomTrackerPageState extends State<SymptomTrackerPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: selectedSymptom,
-                items: _commonSymptoms.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                onChanged: (val) => setDialogState(() => selectedSymptom = val!),
+                initialValue: selectedSymptom,
+                items: _commonSymptoms
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (val) =>
+                    setDialogState(() => selectedSymptom = val!),
                 decoration: const InputDecoration(labelText: 'Symptom'),
               ),
               const SizedBox(height: 20),
@@ -86,16 +91,23 @@ class _SymptomTrackerPageState extends State<SymptomTrackerPage> {
                 max: 5,
                 divisions: 4,
                 label: selectedSeverity.toString(),
-                onChanged: (val) => setDialogState(() => selectedSeverity = val.toInt()),
+                onChanged: (val) =>
+                    setDialogState(() => selectedSeverity = val.toInt()),
               ),
               Text(
-                selectedSeverity == 1 ? 'Mild' : selectedSeverity == 5 ? 'Severe' : 'Moderate',
+                selectedSeverity == 1
+                    ? 'Mild'
+                    : selectedSeverity == 5
+                        ? 'Severe'
+                        : 'Moderate',
                 style: TextStyle(color: _getSeverityColor(selectedSeverity)),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () {
                 _addLog(selectedSymptom, selectedSeverity);
@@ -126,9 +138,11 @@ class _SymptomTrackerPageState extends State<SymptomTrackerPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.healing_outlined, size: 64, color: Colors.grey[300]),
+                  Icon(Icons.healing_outlined,
+                      size: 64, color: Colors.grey[300]),
                   const SizedBox(height: 16),
-                  Text('No symptoms logged yet', style: TextStyle(color: Colors.grey[500])),
+                  Text('No symptoms logged yet',
+                      style: TextStyle(color: Colors.grey[500])),
                 ],
               ),
             )
@@ -144,15 +158,22 @@ class _SymptomTrackerPageState extends State<SymptomTrackerPage> {
                       width: 12,
                       decoration: BoxDecoration(
                         color: _getSeverityColor(log.severity),
-                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            bottomLeft: Radius.circular(12)),
                       ),
                     ),
-                    title: Text(log.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(DateFormat('MMM dd, yyyy • hh:mm a').format(log.timestamp)),
+                    title: Text(log.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(DateFormat('MMM dd, yyyy • hh:mm a')
+                        .format(log.timestamp)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Severity: ${log.severity}', style: TextStyle(color: _getSeverityColor(log.severity), fontWeight: FontWeight.bold)),
+                        Text('Severity: ${log.severity}',
+                            style: TextStyle(
+                                color: _getSeverityColor(log.severity),
+                                fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, size: 20),
@@ -182,19 +203,23 @@ class SymptomLog {
   final int severity;
   final DateTime timestamp;
 
-  SymptomLog({required this.id, required this.name, required this.severity, required this.timestamp});
+  SymptomLog(
+      {required this.id,
+      required this.name,
+      required this.severity,
+      required this.timestamp});
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'severity': severity,
-    'timestamp': timestamp.toIso8601String(),
-  };
+        'id': id,
+        'name': name,
+        'severity': severity,
+        'timestamp': timestamp.toIso8601String(),
+      };
 
   factory SymptomLog.fromJson(Map<String, dynamic> json) => SymptomLog(
-    id: json['id'],
-    name: json['name'],
-    severity: json['severity'],
-    timestamp: DateTime.parse(json['timestamp']),
-  );
+        id: json['id'],
+        name: json['name'],
+        severity: json['severity'],
+        timestamp: DateTime.parse(json['timestamp']),
+      );
 }

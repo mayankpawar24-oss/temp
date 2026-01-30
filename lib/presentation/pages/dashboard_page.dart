@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maternal_infant_care/core/theme/app_theme.dart';
+import 'package:maternal_infant_care/core/services/centralized_translations.dart';
 import 'package:maternal_infant_care/data/models/pregnancy_model.dart';
 import 'package:maternal_infant_care/data/models/feeding_model.dart';
 import 'package:maternal_infant_care/data/models/sleep_model.dart';
@@ -29,6 +30,7 @@ import 'package:maternal_infant_care/presentation/pages/pregnancy_setup_page.dar
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/pages/weekly_stats_page.dart';
 import 'package:maternal_infant_care/presentation/pages/daily_summary_page.dart';
+
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -48,7 +50,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vatsalya Hub'),
+        title: const Tr('dashboard.title'),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.account_circle),
@@ -91,34 +93,34 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               ],
               _buildGreetingCard(context, pregnancyRepo),
               const SizedBox(height: 32),
-              
-              _buildSectionHeader(context, 'Daily Tracker Hub', 'Monitor your baby\'s essentials'),
+              _buildSectionHeader(context, 'Daily Tracker Hub',
+                  'Monitor your baby\'s essentials'),
               const SizedBox(height: 16),
               _buildTrackingGrid(context, feedingRepo, sleepRepo, diaperRepo),
-              
               const SizedBox(height: 32),
-              _buildSectionHeader(context, 'Health & Security', 'Medical milestones & protection'),
+              _buildSectionHeader(context, 'Health & Security',
+                  'Medical milestones & protection'),
               const SizedBox(height: 16),
               _buildHealthSection(context),
-              
               const SizedBox(height: 32),
-              _buildSectionHeader(context, 'Wisdom Center', 'Expert guidance & awareness'),
+              _buildSectionHeader(
+                  context, 'Wisdom Center', 'Expert guidance & awareness'),
               const SizedBox(height: 16),
               _buildWisdomHub(context),
-              
               const SizedBox(height: 32),
-              _buildSectionHeader(context, 'Growth & Stats', 'Visualize progress over time'),
+              _buildSectionHeader(
+                  context, 'Growth & Stats', 'Visualize progress over time'),
               const SizedBox(height: 16),
               _ActionTile(
                 title: 'Weekly Insights',
                 subtitle: 'View charts & trends',
                 icon: Icons.bar_chart,
                 color: Colors.deepPurpleAccent,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WeeklyStatsPage())),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const WeeklyStatsPage())),
               ),
-              
-              
-              const SizedBox(height: 48),            ],
+              const SizedBox(height: 48),
+            ],
           ),
         ),
       ),
@@ -149,14 +151,18 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.child_care, color: Theme.of(context).colorScheme.primary, size: 28),
+                  Icon(Icons.child_care,
+                      color: Theme.of(context).colorScheme.primary, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      username != null && username.isNotEmpty ? 'Hi, $username! ❤️' : 'Welcome Back! ❤️',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      username != null && username.isNotEmpty
+                          ? 'Hi, $username! ❤️'
+                          : 'Welcome Back! ❤️',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
                   ),
                 ],
@@ -165,8 +171,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               Text(
                 'Your little one is growing every day. Stay on top of their needs.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ],
           ),
@@ -180,7 +186,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (pregnancy == null) return _buildNoPregnancyCard(context);
 
         final daysUntilDue = pregnancy.daysUntilDue;
-        final progress = ((9 - (daysUntilDue / 30)).clamp(0.0, 9.0) / 9.0).clamp(0.0, 1.0);
+        final progress =
+            ((9 - (daysUntilDue / 30)).clamp(0.0, 9.0) / 9.0).clamp(0.0, 1.0);
 
         return Container(
           padding: const EdgeInsets.all(24),
@@ -207,12 +214,18 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    username != null && username.isNotEmpty ? 'Hi, $username' : 'Pregnancy Journey',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                    username != null && username.isNotEmpty
+                        ? 'Hi, $username'
+                        : 'Pregnancy Journey',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
                   ),
                   Text(
                     'Month ${pregnancy.currentMonth}',
-                    style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white70, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -255,25 +268,32 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withOpacity(0.5),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           const Icon(Icons.favorite, color: Colors.red, size: 40),
           const SizedBox(height: 12),
           Text(
-            username != null && username.isNotEmpty ? 'Hi, $username!' : 'Welcome to Vatsalya', 
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
-          ),
-          const Text('Track your journey from day one.', style: TextStyle(color: Colors.grey)),
+              username != null && username.isNotEmpty
+                  ? 'Hi, $username!'
+                  : 'Welcome to Vatsalya',
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Text('Track your journey from day one.',
+              style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => PregnancySetupPage()),
+                MaterialPageRoute(builder: (_) => const PregnancySetupPage()),
               );
             },
             child: const Text('Start Journey'),
@@ -283,7 +303,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, String subtitle) {
+  Widget _buildSectionHeader(
+      BuildContext context, String title, String subtitle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -323,7 +344,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   subtitle: '${repo.getFeedingsByDate(today).length} sessions',
                   icon: Icons.restaurant,
                   color: Colors.orange,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedingTrackingPage())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const FeedingTrackingPage())),
                 ),
                 loading: () => const _LoadingHubCard(color: Colors.orange),
                 error: (_, __) => const SizedBox.shrink(),
@@ -334,10 +358,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               child: sleepRepo.when(
                 data: (repo) => _HubCard(
                   title: 'Sleep',
-                  subtitle: '${repo.getTotalSleepHoursByDate(today).toStringAsFixed(1)} hours',
+                  subtitle:
+                      '${repo.getTotalSleepHoursByDate(today).toStringAsFixed(1)} hours',
                   icon: Icons.king_bed,
                   color: Colors.indigo,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SleepTrackingPage())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const SleepTrackingPage())),
                 ),
                 loading: () => const _LoadingHubCard(color: Colors.indigo),
                 error: (_, __) => const SizedBox.shrink(),
@@ -355,7 +383,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   subtitle: '${repo.getDiapersByDate(today).length} changes',
                   icon: Icons.layers,
                   color: Colors.teal,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiaperTrackingPage())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const DiaperTrackingPage())),
                 ),
                 loading: () => const _LoadingHubCard(color: Colors.teal),
                 error: (_, __) => const SizedBox.shrink(),
@@ -368,7 +399,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 subtitle: 'View logs',
                 icon: Icons.assignment,
                 color: Colors.blueGrey,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DailySummaryPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const DailySummaryPage())),
               ),
             ),
           ],
@@ -385,7 +419,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           subtitle: 'Manage upcoming shots & records',
           icon: Icons.medical_services,
           color: Colors.redAccent,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VaccinationPage())),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const VaccinationPage())),
         ),
         const SizedBox(height: 12),
         _ActionTile(
@@ -393,7 +428,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           subtitle: 'Weight, Height & Percentiles',
           icon: Icons.auto_graph,
           color: Colors.blue,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GrowthTrackingPage())),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const GrowthTrackingPage())),
         ),
         const SizedBox(height: 12),
         _ActionTile(
@@ -401,7 +437,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           subtitle: 'Set medicine or routine alerts',
           icon: Icons.alarm_add,
           color: Colors.deepPurple,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RemindersPage())),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const RemindersPage())),
         ),
         const SizedBox(height: 12),
         Row(
@@ -421,7 +458,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('System Active'),
-                        content: const Text('The notification system has been successfully verified. You will receive timely reminders.'),
+                        content: const Text(
+                            'The notification system has been successfully verified. You will receive timely reminders.'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
@@ -440,7 +478,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 label: 'Scheduled',
                 icon: Icons.event_note,
                 onTap: () async {
-                  final pending = await NotificationService.getPendingNotifications();
+                  final pending =
+                      await NotificationService.getPendingNotifications();
                   if (context.mounted) {
                     showDialog(
                       context: context,
@@ -448,17 +487,20 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                         title: const Text('Past Alarms'),
                         content: SizedBox(
                           width: double.maxFinite,
-                          child: pending.isEmpty 
-                            ? const Text('No pending reminders at this time.')
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: pending.length,
-                                itemBuilder: (context, index) => ListTile(
-                                  leading: const Icon(Icons.alarm),
-                                  title: Text(pending[index].title ?? 'Alert', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  subtitle: Text(pending[index].body ?? '', style: const TextStyle(fontSize: 12)),
+                          child: pending.isEmpty
+                              ? const Text('No pending reminders at this time.')
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: pending.length,
+                                  itemBuilder: (context, index) => ListTile(
+                                    leading: const Icon(Icons.alarm),
+                                    title: Text(pending[index].title ?? 'Alert',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    subtitle: Text(pending[index].body ?? '',
+                                        style: const TextStyle(fontSize: 12)),
+                                  ),
                                 ),
-                              ),
                         ),
                         actions: [
                           TextButton(
@@ -487,7 +529,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             subtitle: 'Awareness & Prevention',
             icon: Icons.health_and_safety,
             color: Colors.green,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiseaseAwarenessPage())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const DiseaseAwarenessPage())),
           ),
         ),
         const SizedBox(width: 16),
@@ -497,7 +542,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             subtitle: 'Feeding & Diet guides',
             icon: Icons.restaurant_menu,
             color: Colors.orange,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NutritionGuidancePage())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const NutritionGuidancePage())),
           ),
         ),
       ],
@@ -622,7 +670,9 @@ class _ActionTile extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+        side: BorderSide(
+            color:
+                Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -636,11 +686,11 @@ class _ActionTile extends StatelessWidget {
           child: Icon(icon, color: color, size: 24),
         ),
         title: Text(
-          title, 
+          title,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          subtitle, 
+          subtitle,
           style: TextStyle(
             fontSize: 12,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -670,7 +720,9 @@ class _SmallActionChip extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+        side: BorderSide(
+            color:
+                Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -679,12 +731,13 @@ class _SmallActionChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
           child: Column(
             children: [
-              Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+              Icon(icon,
+                  size: 20, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 8),
               Text(
-                label, 
+                label,
                 style: const TextStyle(
-                  fontSize: 11, 
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -695,4 +748,3 @@ class _SmallActionChip extends StatelessWidget {
     );
   }
 }
-

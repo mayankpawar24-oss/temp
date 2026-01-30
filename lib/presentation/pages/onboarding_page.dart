@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maternal_infant_care/core/theme/app_theme.dart';
 
 import 'package:maternal_infant_care/presentation/pages/auth_page.dart';
 
@@ -19,17 +17,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final List<OnboardingItem> _pages = [
     OnboardingItem(
       title: 'Track Your Pregnancy Journey',
-      description: 'Month-by-month guidance with checklists, reminders, and health tips.',
+      description:
+          'Month-by-month guidance with checklists, reminders, and health tips.',
       icon: Icons.pregnant_woman,
     ),
     OnboardingItem(
       title: 'Monitor Infant Development',
-      description: 'Track feeding, sleep patterns, growth milestones, and vaccinations.',
+      description:
+          'Track feeding, sleep patterns, growth milestones, and vaccinations.',
       icon: Icons.child_care,
     ),
     OnboardingItem(
       title: 'Stay Healthy & Informed',
-      description: 'Get nutrition guidance, disease awareness, and preventive care tips.',
+      description:
+          'Get nutrition guidance, disease awareness, and preventive care tips.',
       icon: Icons.health_and_safety,
     ),
   ];
@@ -54,7 +55,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   void _navigateToNext() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const AuthPage(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const AuthPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

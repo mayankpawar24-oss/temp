@@ -5,6 +5,8 @@ import 'package:maternal_infant_care/data/models/vaccination_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/core/utils/vaccination_schedule.dart';
 import 'package:maternal_infant_care/core/utils/reminder_service.dart';
+import 'package:maternal_infant_care/core/services/centralized_translations.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/language_provider.dart';
 
 class VaccinationPage extends ConsumerStatefulWidget {
   const VaccinationPage({super.key});
@@ -13,7 +15,8 @@ class VaccinationPage extends ConsumerStatefulWidget {
   ConsumerState<VaccinationPage> createState() => _VaccinationPageState();
 }
 
-class _VaccinationPageState extends ConsumerState<VaccinationPage> with SingleTickerProviderStateMixin {
+class _VaccinationPageState extends ConsumerState<VaccinationPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -31,16 +34,17 @@ class _VaccinationPageState extends ConsumerState<VaccinationPage> with SingleTi
   @override
   Widget build(BuildContext context) {
     final vaccinationRepo = ref.watch(vaccinationRepositoryProvider);
+    final languageCode = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vaccinations'),
+        title: const Tr('vaccination.title'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Upcoming'),
-            Tab(text: 'Completed'),
-            Tab(text: 'Schedule'),
+            Tab(child: Tr('vaccination.tab_upcoming')),
+            Tab(child: Tr('vaccination.tab_completed')),
+            Tab(child: Tr('vaccination.tab_schedule')),
           ],
         ),
       ),
@@ -52,14 +56,21 @@ class _VaccinationPageState extends ConsumerState<VaccinationPage> with SingleTi
           return TabBarView(
             controller: _tabController,
             children: [
-              _UpcomingTab(vaccinations: upcoming, repo: repo),
-              _CompletedTab(vaccinations: completed),
+              _UpcomingTab(
+                  vaccinations: upcoming,
+                  repo: repo,
+                  languageCode: languageCode),
+              _CompletedTab(
+                  vaccinations: completed, languageCode: languageCode),
               _ScheduleTab(repo: repo),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: ${error.toString()}')),
+        error: (error, stack) => Center(
+          child:
+              Text('${'common.error'.tr(languageCode)}: ${error.toString()}'),
+        ),
       ),
     );
   }
@@ -68,8 +79,13 @@ class _VaccinationPageState extends ConsumerState<VaccinationPage> with SingleTi
 class _UpcomingTab extends StatelessWidget {
   final List<VaccinationModel> vaccinations;
   final dynamic repo;
+  final String languageCode;
 
-  const _UpcomingTab({required this.vaccinations, required this.repo});
+  const _UpcomingTab({
+    required this.vaccinations,
+    required this.repo,
+    required this.languageCode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +100,7 @@ class _UpcomingTab extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
-            Text(
-              'No upcoming vaccinations',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            const Tr('vaccination.no_upcoming'),
           ],
         ),
       );
@@ -98,7 +111,8 @@ class _UpcomingTab extends StatelessWidget {
       itemCount: vaccinations.length,
       itemBuilder: (context, index) {
         final vaccination = vaccinations[index];
-        return _VaccinationCard(vaccination: vaccination, repo: repo, isUpcoming: true);
+        return _VaccinationCard(
+            vaccination: vaccination, repo: repo, isUpcoming: true);
       },
     );
   }
@@ -106,8 +120,9 @@ class _UpcomingTab extends StatelessWidget {
 
 class _CompletedTab extends StatelessWidget {
   final List<VaccinationModel> vaccinations;
+  final String languageCode;
 
-  const _CompletedTab({required this.vaccinations});
+  const _CompletedTab({required this.vaccinations, required this.languageCode});
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +137,7 @@ class _CompletedTab extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
-            Text(
-              'No completed vaccinations',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            const Tr('vaccination.no_completed'),
           ],
         ),
       );
@@ -136,7 +148,8 @@ class _CompletedTab extends StatelessWidget {
       itemCount: vaccinations.length,
       itemBuilder: (context, index) {
         final vaccination = vaccinations[index];
-        return _VaccinationCard(vaccination: vaccination, repo: null, isUpcoming: false);
+        return _VaccinationCard(
+            vaccination: vaccination, repo: null, isUpcoming: false);
       },
     );
   }
@@ -170,7 +183,8 @@ class _ScheduleTab extends ConsumerWidget {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Age: ${item['age']}'),
+                Text(
+                    '${'vaccination.age'.tr(ref.watch(languageProvider))} ${item['age']}'),
                 if (item['description'] != null)
                   Text(item['description'] as String),
               ],
@@ -179,8 +193,9 @@ class _ScheduleTab extends ConsumerWidget {
               onPressed: () async {
                 try {
                   final ageInDays = _parseAgeToDays(item['age'] as String);
-                  final scheduledDate = DateTime.now().add(Duration(days: ageInDays));
-                  
+                  final scheduledDate =
+                      DateTime.now().add(Duration(days: ageInDays));
+
                   final vaccination = VaccinationModel(
                     id: DateTime.now().millisecondsSinceEpoch.toString(),
                     name: item['name'] as String,
@@ -188,22 +203,28 @@ class _ScheduleTab extends ConsumerWidget {
                     ageInDays: ageInDays,
                   );
                   await repo.saveVaccination(vaccination);
-                  await ReminderService.scheduleVaccinationReminder(vaccination);
+                  await ReminderService.scheduleVaccinationReminder(
+                      vaccination);
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Vaccination scheduled')),
+                      SnackBar(
+                          content: Text('vaccination.scheduled'
+                              .tr(ref.read(languageProvider)))),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: ${e.toString()}')),
+                      SnackBar(
+                          content: Text(
+                              '${'common.error'.tr(ref.read(languageProvider))}: ${e.toString()}')),
                     );
                   }
                 }
               },
-              child: const Text('Schedule'),
+              child:
+                  Text('vaccination.schedule'.tr(ref.watch(languageProvider))),
             ),
           ),
         );
@@ -229,7 +250,7 @@ class _ScheduleTab extends ConsumerWidget {
   }
 }
 
-class _VaccinationCard extends StatelessWidget {
+class _VaccinationCard extends ConsumerWidget {
   final VaccinationModel vaccination;
   final dynamic repo;
   final bool isUpcoming;
@@ -241,7 +262,7 @@ class _VaccinationCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       color: isUpcoming && vaccination.daysUntilDue <= 7
@@ -254,7 +275,9 @@ class _VaccinationCard extends StatelessWidget {
               : Theme.of(context).colorScheme.primaryContainer,
           child: Icon(
             vaccination.isCompleted ? Icons.check_circle : Icons.vaccines,
-            color: vaccination.isCompleted ? Colors.green : Theme.of(context).colorScheme.primary,
+            color: vaccination.isCompleted
+                ? Colors.green
+                : Theme.of(context).colorScheme.primary,
           ),
         ),
         title: Text(vaccination.name),
@@ -262,12 +285,16 @@ class _VaccinationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!vaccination.isCompleted)
-              Text('Due: ${DateFormat('MMM dd, yyyy').format(vaccination.scheduledDate)}'),
+              Text(
+                '${'vaccination.due'.tr(ref.watch(languageProvider))} ${DateFormat('MMM dd, yyyy').format(vaccination.scheduledDate)}',
+              ),
             if (vaccination.isCompleted && vaccination.administeredDate != null)
-              Text('Administered: ${DateFormat('MMM dd, yyyy').format(vaccination.administeredDate!)}'),
+              Text(
+                '${'vaccination.administered'.tr(ref.watch(languageProvider))} ${DateFormat('MMM dd, yyyy').format(vaccination.administeredDate!)}',
+              ),
             if (isUpcoming)
               Text(
-                '${vaccination.daysUntilDue} days left',
+                '${vaccination.daysUntilDue} ${'vaccination.days_left'.tr(ref.watch(languageProvider))}',
                 style: TextStyle(
                   color: vaccination.daysUntilDue <= 7
                       ? Theme.of(context).colorScheme.error
@@ -276,9 +303,13 @@ class _VaccinationCard extends StatelessWidget {
                 ),
               ),
             if (vaccination.batchNumber != null)
-              Text('Batch: ${vaccination.batchNumber}'),
+              Text(
+                '${'vaccination.batch'.tr(ref.watch(languageProvider))} ${vaccination.batchNumber}',
+              ),
             if (vaccination.doctorName != null)
-              Text('Doctor: ${vaccination.doctorName}'),
+              Text(
+                '${'vaccination.doctor'.tr(ref.watch(languageProvider))} ${vaccination.doctorName}',
+              ),
           ],
         ),
         trailing: isUpcoming

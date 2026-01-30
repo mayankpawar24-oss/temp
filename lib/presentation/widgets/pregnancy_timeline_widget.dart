@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:maternal_infant_care/data/models/pregnancy_model.dart';
 
 class PregnancyTimelineWidget extends StatelessWidget {
@@ -88,7 +87,9 @@ class _TimelineItem extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: Card(
-            color: isCurrent ? Theme.of(context).colorScheme.primaryContainer : null,
+            color: isCurrent
+                ? Theme.of(context).colorScheme.primaryContainer
+                : null,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -98,7 +99,9 @@ class _TimelineItem extends StatelessWidget {
                     'Month $month',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: isCurrent ? Theme.of(context).colorScheme.onPrimaryContainer : null,
+                          color: isCurrent
+                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                              : null,
                         ),
                   ),
                   if (isCurrent) ...[
@@ -106,7 +109,10 @@ class _TimelineItem extends StatelessWidget {
                     Text(
                       'Current Month',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer
+                                .withOpacity(0.7),
                           ),
                     ),
                   ],
