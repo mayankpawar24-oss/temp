@@ -5,6 +5,7 @@ import 'package:maternal_infant_care/data/models/dashboard_card_model.dart';
 import 'package:maternal_infant_care/presentation/widgets/customizable_dashboard.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
+import 'package:maternal_infant_care/presentation/pages/fertile_window_visualization_page.dart';
 
 class TryingToConceiveDashboardPage extends ConsumerWidget {
   const TryingToConceiveDashboardPage({super.key});
@@ -137,6 +138,24 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const FertileWindowVisualizationPage(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.calendar_month),
+                    label: const Text('View Calendar'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
               ],
             );

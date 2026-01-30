@@ -14,6 +14,8 @@ import 'package:maternal_infant_care/data/repositories/milestone_repository.dart
 import 'package:maternal_infant_care/data/repositories/chat_history_repository.dart';
 import 'package:maternal_infant_care/data/repositories/fertility_profile_repository.dart';
 import 'package:maternal_infant_care/data/repositories/user_profile_repository.dart';
+import 'package:maternal_infant_care/data/repositories/pregnant_daily_summary_repository.dart';
+import 'package:maternal_infant_care/data/repositories/pregnant_weekly_summary_repository.dart';
 import 'package:maternal_infant_care/data/models/fertility_profile_model.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/auth_provider.dart';
 
@@ -127,4 +129,18 @@ final fertilityProfileProvider =
 final chatSessionsProvider = FutureProvider((ref) async {
   final repo = await ref.watch(chatHistoryRepositoryProvider.future);
   return repo.getSessions();
+});
+
+final pregnantDailySummaryRepositoryProvider =
+    FutureProvider<PregnantDailySummaryRepository>((ref) async {
+  final repo = PregnantDailySummaryRepository();
+  await repo.init();
+  return repo;
+});
+
+final pregnantWeeklySummaryRepositoryProvider =
+    FutureProvider<PregnantWeeklySummaryRepository>((ref) async {
+  final repo = PregnantWeeklySummaryRepository();
+  await repo.init();
+  return repo;
 });

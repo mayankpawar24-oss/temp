@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/pregnancy_insights_viewmodel.dart';
 import 'package:maternal_infant_care/data/models/feeding_model.dart';
 import 'package:maternal_infant_care/data/models/sleep_model.dart';
 import 'package:maternal_infant_care/data/models/diaper_model.dart';
@@ -50,10 +53,22 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userMeta = ref.watch(userMetaProvider);
     final feedingRepo = ref.watch(feedingRepositoryProvider);
     final sleepRepo = ref.watch(sleepRepositoryProvider);
     final diaperRepo = ref.watch(diaperRepositoryProvider);
+    final pregnantDailySummaryRepo = ref.watch(pregnantDailySummaryRepositoryProvider);
 
+    // Show pregnancy view for pregnant users
+    if (userMeta.role == UserProfileType.pregnant) {
+      return _buildPregnantView(context, pregnantDailySummaryRepo);
+    }
+
+    // Default toddler view
+    return _buildToddlerView(context, feedingRepo, sleepRepo, diaperRepo);
+  }
+
+  Widget _buildPregnantView(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -71,11 +86,56 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
       ),
       body: Stack(
         children: [
-          // Parchment background
-          Container(
-             color: Theme.of(context).scaffoldBackgroundColor,
+          Container(color: Theme.of(context).scaffoldBackgroundColor),
+          SafeArea(
+            child: Column(
+              children: [
+                _buildDateNavigator(context),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildPregnantSummaryCards(context),
+                        const SizedBox(height: 24),
+                        _buildPregnantHealthInsights(context),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToddlerView(
+    BuildContext context,
+    AsyncValue<dynamic> feedingRepo,
+    AsyncValue<dynamic> sleepRepo,
+    AsyncValue<dynamic> diaperRepo,
+  ) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text('Daily Summary'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: const Color(0xFF455A64),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () => _pickDate(context),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(color: Theme.of(context).scaffoldBackgroundColor),
           SafeArea(
             child: Column(
               children: [
@@ -347,6 +407,163 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
         );
       },
     );
+  }
+
+  Widget _buildPregnantSummaryCards(BuildContext context) {
+    final theme = Theme.of(context);
+    final pregnancyData = ref.watch(pregnancyRepositoryProvider);
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: pregnancyData.when(
+                data: (repo) {
+                  final pregnancy = repo.getPregnancy();
+                  return _StatCard(
+                    title: 'Gestational Age',
+                    value: '${pregnancy?.weeksPregnant ?? 0}w',
+                    subtitle: '${(pregnancy?.weeksPregnant ?? 0) * 7} days',
+                    icon: Icons.favorite,
+                    color: theme.colorScheme.primary,
+                  );
+                },
+                loading: () => const _LoadingCard(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: pregnancyData.when(
+                data: (repo) {
+                  final pregnancy = repo.getPregnancy();
+                  final trimester = ((pregnancy?.weeksPregnant ?? 0) ~/ 13) + 1;
+                  return _StatCard(
+                    title: 'Trimester',
+                    value: 'T$trimester',
+                    subtitle: 'Current trimester',
+                    icon: Icons.child_care,
+                    color: theme.colorScheme.secondary,
+                  );
+                },
+                loading: () => const _LoadingCard(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPregnantHealthInsights(BuildContext context) {
+    final insightsProvider = ref.watch(pregnancyInsightsViewModelProvider);
+
+    return insightsProvider.when(
+      data: (insights) {
+        if (insights == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Daily Health Insights',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            _buildInsightCard(context, 'Hydration', insights.waterIntake.status, insights.waterIntake.message, Icons.local_drink),
+            const SizedBox(height: 12),
+            _buildInsightCard(context, 'Baby Movement', insights.babyMovement.status, insights.babyMovement.message, Icons.favorite),
+            const SizedBox(height: 12),
+            _buildInsightCard(context, 'Symptoms', insights.symptoms.status, insights.symptoms.message, Icons.health_and_safety),
+            const SizedBox(height: 12),
+            _buildInsightCard(context, 'Prenatal Vitamins', insights.vitamins.status, insights.vitamins.message, Icons.medication),
+          ],
+        );
+      },
+      loading: () => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, st) => Text(
+        'Unable to calculate insights: ${error.toString()}',
+        style: TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  Widget _buildInsightCard(
+    BuildContext context,
+    String title,
+    InsightStatus status,
+    String message,
+    IconData icon,
+  ) {
+    final theme = Theme.of(context);
+    final (statusColor, statusEmoji) = _getStatusDisplay(status);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: statusColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: statusColor.withOpacity(0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: statusColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '$statusEmoji $title',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 40),
+            child: Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  (Color, String) _getStatusDisplay(InsightStatus status) {
+    return switch (status) {
+      InsightStatus.good => (Colors.green.shade600, '🟢'),
+      InsightStatus.warning => (Colors.orange.shade600, '🟡'),
+      InsightStatus.alert => (Colors.red.shade600, '🔴'),
+    };
   }
 }
 

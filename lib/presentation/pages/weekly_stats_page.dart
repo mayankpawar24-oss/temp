@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
 
 class WeeklyStatsPage extends ConsumerStatefulWidget {
   const WeeklyStatsPage({super.key});
@@ -22,10 +24,76 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userMeta = ref.watch(userMetaProvider);
     final feedingRepo = ref.watch(feedingRepositoryProvider);
     final sleepRepo = ref.watch(sleepRepositoryProvider);
     final diaperRepo = ref.watch(diaperRepositoryProvider);
+    final pregnantWeeklySummaryRepo = ref.watch(pregnantWeeklySummaryRepositoryProvider);
 
+    // Show pregnancy view for pregnant users
+    if (userMeta.role == UserProfileType.pregnant) {
+      return _buildPregnantView(context, pregnantWeeklySummaryRepo);
+    }
+
+    // Default toddler view
+    return _buildToddlerView(context, feedingRepo, sleepRepo, diaperRepo);
+  }
+
+  Widget _buildPregnantView(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
+    final weekEnd = _weekStart.add(const Duration(days: 6));
+    final dateRangeText = '${DateFormat('MMM d').format(_weekStart)} - ${DateFormat('MMM d, y').format(weekEnd)}';
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text('Weekly Insights'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: const Color(0xFF455A64),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8F5E9),
+                  Color(0xFFE3F2FD),
+                ],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                _buildWeekNavigator(dateRangeText, _weekStart),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        _buildPregnantWeeklyCard(context, pregnantSummaryRepo),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToddlerView(
+    BuildContext context,
+    AsyncValue<dynamic> feedingRepo,
+    AsyncValue<dynamic> sleepRepo,
+    AsyncValue<dynamic> diaperRepo,
+  ) {
     final weekEnd = _weekStart.add(const Duration(days: 6));
     final dateRangeText = '${DateFormat('MMM d').format(_weekStart)} - ${DateFormat('MMM d, y').format(weekEnd)}';
 
@@ -57,44 +125,7 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
           SafeArea(
             child: Column(
               children: [
-                // Week Navigator
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.white.withOpacity(0.8)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, size: 18),
-                        onPressed: () => _changeWeek(-1),
-                        color: Colors.blueGrey,
-                      ),
-                      Text(
-                        dateRangeText,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey[800],
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.arrow_forward_ios, size: 18),
-                        onPressed: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
-                            ? null 
-                            : () => _changeWeek(1),
-                        color: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
-                            ? Colors.grey.withOpacity(0.3) 
-                            : Colors.blueGrey,
-                      ),
-                    ],
-                  ),
-                ),
-
+                _buildWeekNavigator(dateRangeText, _weekStart),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
@@ -138,6 +169,196 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeekNavigator(String dateRangeText, DateTime weekStart) {
+    final weekEnd = weekStart.add(const Duration(days: 6));
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.white.withOpacity(0.8)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios, size: 18),
+            onPressed: () => _changeWeek(-1),
+            color: Colors.blueGrey,
+          ),
+          Text(
+            dateRangeText,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey[800],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward_ios, size: 18),
+            onPressed: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
+                ? null 
+                : () => _changeWeek(1),
+            color: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
+                ? Colors.grey.withOpacity(0.3) 
+                : Colors.blueGrey,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPregnantWeeklyCard(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
+    return pregnantSummaryRepo.when(
+      data: (repo) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.9)),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Weekly Pregnancy Progress',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Baby Movements This Week',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Active Days', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    )),
+                    Text('0 days', style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Symptom Trends',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    _buildSymptomTrendRow(context, 'Fatigue', 5),
+                    const SizedBox(height: 12),
+                    _buildSymptomTrendRow(context, 'Nausea', 3),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Health Metrics',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    _buildMetricRow(context, 'Avg Water Intake', '1.5L / 2L'),
+                    const SizedBox(height: 12),
+                    _buildMetricRow(context, 'Vitamins Taken', '5 / 7 days'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const _LoadingChart(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildSymptomTrendRow(BuildContext context, String symptom, int count) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(symptom, style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: Colors.black87,
+          fontWeight: FontWeight.w600,
+        )),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            '$count days',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetricRow(BuildContext context, String metric, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(metric, style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: Colors.black87,
+          fontWeight: FontWeight.w600,
+        )),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ],
     );
   }
 
