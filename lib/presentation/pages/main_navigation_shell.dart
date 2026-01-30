@@ -7,11 +7,13 @@ import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart'
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/pages/pregnancy_setup_page.dart';
 import 'package:maternal_infant_care/presentation/pages/toddler_setup_page.dart';
+import 'package:maternal_infant_care/presentation/pages/trying_to_conceive_setup_page.dart';
 import 'package:maternal_infant_care/core/utils/notification_service.dart';
 
 // We'll import these when we create them, for now using placeholders/existing
 import 'package:maternal_infant_care/presentation/pages/pregnant_dashboard_page.dart';
 import 'package:maternal_infant_care/presentation/pages/toddler_dashboard_page.dart';
+import 'package:maternal_infant_care/presentation/pages/trying_to_conceive_dashboard_page.dart';
 
 class MainNavigationShell extends ConsumerStatefulWidget {
   const MainNavigationShell({super.key});
@@ -43,6 +45,8 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
     if (userMeta.startDate == null) {
       if (userMeta.role == UserProfileType.pregnant) {
         return const PregnancySetupPage();
+      } else if (userMeta.role == UserProfileType.tryingToConceive) {
+        return const TryingToConceiveSetupPage();
       } else if (userMeta.role == UserProfileType.toddlerParent) {
         return const ToddlerSetupPage();
       }
@@ -51,9 +55,11 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
     // Determine the dashboard based on profile type
     Widget homePage;
     if (userMeta.role == UserProfileType.pregnant) {
-       homePage = const PregnantDashboardPage();
+      homePage = const PregnantDashboardPage();
+    } else if (userMeta.role == UserProfileType.tryingToConceive) {
+      homePage = const TryingToConceiveDashboardPage();
     } else {
-       homePage = const ToddlerDashboardPage();
+      homePage = const ToddlerDashboardPage();
     }
 
     final screens = [

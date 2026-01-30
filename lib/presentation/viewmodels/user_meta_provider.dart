@@ -23,9 +23,13 @@ class UserMeta {
     if (metadata == null) return UserMeta();
     
     final roleStr = metadata['role'] as String?;
-    final role = roleStr == 'pregnant' 
-        ? UserProfileType.pregnant 
-        : (roleStr == 'parent' || roleStr == 'toddler_parent' ? UserProfileType.toddlerParent : null);
+    final role = roleStr == 'pregnant'
+      ? UserProfileType.pregnant
+      : (roleStr == 'trying_to_conceive'
+        ? UserProfileType.tryingToConceive
+        : (roleStr == 'parent' || roleStr == 'toddler_parent'
+          ? UserProfileType.toddlerParent
+          : null));
     
     final startDateStr = metadata['start_date'] as String?;
     final startDate = startDateStr != null ? DateTime.tryParse(startDateStr) : null;

@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
 import 'package:maternal_infant_care/presentation/pages/pregnancy_setup_page.dart';
+import 'package:maternal_infant_care/presentation/pages/trying_to_conceive_setup_page.dart';
 import 'package:maternal_infant_care/presentation/pages/main_navigation_shell.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/auth_provider.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -18,7 +20,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _isPregnant = false;
+  UserProfileType _selectedProfileType = UserProfileType.toddlerParent;
   bool _isLoading = false;
 
   @override
@@ -56,12 +58,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     try {
       final authService = ref.read(authServiceProvider);
+      final role = _roleStringFromProfile(_selectedProfileType);
       final success = await authService.signUp(
         email: email,
         password: password,
         data: {
           'username': username,
-          'role': _isPregnant ? 'pregnant' : 'toddler_parent',
+          'role': role,
         },
       );
 
@@ -74,8 +77,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       ref.read(authStateProvider.notifier).setUser(authService.currentUser);
 
       // Update local provider state
-      ref.read(userProfileProvider.notifier).state = 
-          _isPregnant ? UserProfileType.pregnant : UserProfileType.toddlerParent;
+      ref.read(userProfileProvider.notifier).state = _selectedProfileType;
+
+      final supabaseUser = Supabase.instance.client.auth.currentUser;
+      if (supabaseUser != null) {
+        final profileRepo = ref.read(userProfileRepositoryProvider);
+        await profileRepo.upsertProfile(
+          userId: supabaseUser.id,
+          email: supabaseUser.email ?? email,
+          role: role,
+          profileType: role,
+        );
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -85,9 +98,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       );
 
       // Navigate based on selection
-      if (_isPregnant) {
+      if (_selectedProfileType == UserProfileType.pregnant) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const PregnancySetupPage()),
+          (route) => false,
+        );
+      } else if (_selectedProfileType == UserProfileType.tryingToConceive) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const TryingToConceiveSetupPage()),
           (route) => false,
         );
       } else {
@@ -211,25 +229,28 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           ),
                     ),
                     const SizedBox(height: 12),
-                    RadioListTile<bool>(
-                      title: const Text('Pregnant Mom'),
-                      value: true,
-                      groupValue: _isPregnant,
-                      onChanged: (val) => setState(() => _isPregnant = val!),
-                      secondary: Icon(
-                        Icons.pregnant_woman,
-                        color: _isPregnant ? Theme.of(context).colorScheme.primary : Colors.grey,
-                      ),
+                    _buildProfileOption(
+                      context,
+                      title: 'Pregnant Mom',
+                      subtitle: 'Pregnancy tracking & care',
+                      icon: Icons.pregnant_woman,
+                      value: UserProfileType.pregnant,
                     ),
-                    RadioListTile<bool>(
-                      title: const Text('Toddler Parent'),
-                      value: false,
-                      groupValue: _isPregnant,
-                      onChanged: (val) => setState(() => _isPregnant = val!),
-                      secondary: Icon(
-                        Icons.child_care,
-                        color: !_isPregnant ? Theme.of(context).colorScheme.secondary : Colors.grey,
-                      ),
+                    const SizedBox(height: 12),
+                    _buildProfileOption(
+                      context,
+                      title: 'Trying to Conceive',
+                      subtitle: 'Fertility & Ovulation Tracking',
+                      icon: Icons.favorite_border,
+                      value: UserProfileType.tryingToConceive,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildProfileOption(
+                      context,
+                      title: 'Toddler Parent',
+                      subtitle: 'Growth & Development',
+                      icon: Icons.child_care,
+                      value: UserProfileType.toddlerParent,
                     ),
                   ],
                 ),
@@ -248,6 +269,83 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       : const Text('Create Account'),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _roleStringFromProfile(UserProfileType type) {
+    switch (type) {
+      case UserProfileType.pregnant:
+        return 'pregnant';
+      case UserProfileType.tryingToConceive:
+        return 'trying_to_conceive';
+      case UserProfileType.toddlerParent:
+        return 'toddler_parent';
+    }
+  }
+
+  Widget _buildProfileOption(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required UserProfileType value,
+  }) {
+    final isSelected = _selectedProfileType == value;
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: () => setState(() => _selectedProfileType = value),
+      borderRadius: BorderRadius.circular(16),
+      child: Card(
+        elevation: isSelected ? 2 : 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isSelected ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceVariant,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSelected)
+                Icon(Icons.check_circle, color: theme.colorScheme.primary),
             ],
           ),
         ),

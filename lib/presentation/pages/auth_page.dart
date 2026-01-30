@@ -82,6 +82,8 @@ class _AuthPageState extends ConsumerState<AuthPage> with SingleTickerProviderSt
       final role = authService.userMetadata['role'] as String?;
       if (role == 'pregnant') {
         ref.read(userProfileProvider.notifier).state = UserProfileType.pregnant;
+      } else if (role == 'trying_to_conceive') {
+        ref.read(userProfileProvider.notifier).state = UserProfileType.tryingToConceive;
       } else if (role == 'parent' || role == 'toddler_parent') {
         ref.read(userProfileProvider.notifier).state = UserProfileType.toddlerParent;
       }

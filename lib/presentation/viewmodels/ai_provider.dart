@@ -16,6 +16,8 @@ final geminiServiceProvider = Provider<GeminiService>((ref) {
   String instruction = "You are a helpful maternal and infant care assistant.";
   if (userProfile == UserProfileType.pregnant) {
     instruction += " The user is currently pregnant. Provide advice relevant to pregnancy.";
+  } else if (userProfile == UserProfileType.tryingToConceive) {
+    instruction += " The user is trying to conceive. Provide fertility, ovulation, and cycle-tracking guidance.";
   } else if (userProfile == UserProfileType.toddlerParent) {
     instruction += " The user is a parent of a toddler. Provide advice relevant to parenting a toddler.";
   }

@@ -9,6 +9,7 @@ class DashboardPreferencesRepository {
   // Separate defaults for different user types
   static const String _pregnantPrefix = 'pregnant_';
   static const String _toddlerPrefix = 'toddler_';
+  static const String _tryingPrefix = 'trying_';
 
   DashboardPreferencesRepository();
 
@@ -18,7 +19,9 @@ class DashboardPreferencesRepository {
 
   // Get cards for a specific user type
   List<DashboardCardModel> getCards(UserProfileType type) {
-    final prefix = type == UserProfileType.pregnant ? _pregnantPrefix : _toddlerPrefix;
+    final prefix = type == UserProfileType.pregnant
+        ? _pregnantPrefix
+        : (type == UserProfileType.tryingToConceive ? _tryingPrefix : _toddlerPrefix);
     final cards = _box.values.where((card) => card.id.startsWith(prefix)).toList();
     
     if (cards.isEmpty) {
@@ -48,7 +51,9 @@ class DashboardPreferencesRepository {
   // Initialize default cards if none exist
   List<DashboardCardModel> _initializeDefaults(UserProfileType type) {
     List<DashboardCardModel> defaults = [];
-    final prefix = type == UserProfileType.pregnant ? _pregnantPrefix : _toddlerPrefix;
+    final prefix = type == UserProfileType.pregnant
+        ? _pregnantPrefix
+        : (type == UserProfileType.tryingToConceive ? _tryingPrefix : _toddlerPrefix);
 
     if (type == UserProfileType.pregnant) {
       defaults = [
@@ -58,6 +63,12 @@ class DashboardPreferencesRepository {
         DashboardCardModel(id: '${prefix}symptoms', title: 'Symptom Tracker', widgetType: 'symptom_tracker', order: 3),
         DashboardCardModel(id: '${prefix}kick_counter', title: 'Kick Counter', widgetType: 'kick_counter', order: 4),
         DashboardCardModel(id: '${prefix}tips', title: 'Daily Tips', widgetType: 'daily_tips', order: 5),
+      ];
+    } else if (type == UserProfileType.tryingToConceive) {
+      defaults = [
+        DashboardCardModel(id: '${prefix}fertility_overview', title: 'Fertility Overview', widgetType: 'fertility_overview', order: 0),
+        DashboardCardModel(id: '${prefix}ovulation_window', title: 'Ovulation Window', widgetType: 'ovulation_window', order: 1),
+        DashboardCardModel(id: '${prefix}tips', title: 'Fertility Tips', widgetType: 'daily_tips', order: 2),
       ];
     } else {
       defaults = [

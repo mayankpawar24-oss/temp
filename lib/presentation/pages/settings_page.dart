@@ -60,7 +60,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   Future<void> _updateStartDate() async {
     final userMeta = ref.read(userMetaProvider);
-    final isPregnancy = userMeta.role == UserProfileType.pregnant;
+    final label = _journeyLabel(userMeta.role);
 
     final picked = await showDatePicker(
       context: context,
@@ -77,7 +77,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${isPregnancy ? "Last Period Date" : "Baby Birthday"} updated')),
+            SnackBar(content: Text('$label updated')),
           );
         }
       } catch (e) {
@@ -200,7 +200,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final userMeta = ref.watch(userMetaProvider);
-    final isPregnancy = userMeta.role == UserProfileType.pregnant;
+    final journeyLabel = _journeyLabel(userMeta.role);
+    final journeyIcon = _journeyIcon(userMeta.role);
 
     return Scaffold(
       appBar: AppBar(
@@ -239,9 +240,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           _buildSectionHeader('My Journey'),
           const SizedBox(height: 16),
           ListTile(
-            title: Text(isPregnancy ? 'Last Period Date' : 'Baby Birthday'),
+            title: Text(journeyLabel),
             subtitle: Text(userMeta.startDate != null ? DateFormat('MMMM dd, yyyy').format(userMeta.startDate!) : 'Not set'),
-            leading: Icon(isPregnancy ? Icons.pregnant_woman : Icons.child_care, color: Theme.of(context).colorScheme.primary),
+            leading: Icon(journeyIcon, color: Theme.of(context).colorScheme.primary),
             trailing: const Icon(Icons.edit_outlined, size: 20),
             onTap: _updateStartDate,
             tileColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
@@ -303,5 +304,22 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       tileColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
+  }
+
+  String _journeyLabel(UserProfileType? role) {
+    if (role == UserProfileType.pregnant || role == UserProfileType.tryingToConceive) {
+      return 'Last Period Date';
+    }
+    return 'Baby Birthday';
+  }
+
+  IconData _journeyIcon(UserProfileType? role) {
+    if (role == UserProfileType.pregnant) {
+      return Icons.pregnant_woman;
+    }
+    if (role == UserProfileType.tryingToConceive) {
+      return Icons.favorite_border;
+    }
+    return Icons.child_care;
   }
 }

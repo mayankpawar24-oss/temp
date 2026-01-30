@@ -12,6 +12,10 @@ import 'package:maternal_infant_care/data/repositories/kick_log_repository.dart'
 import 'package:maternal_infant_care/data/repositories/contraction_repository.dart';
 import 'package:maternal_infant_care/data/repositories/milestone_repository.dart';
 import 'package:maternal_infant_care/data/repositories/chat_history_repository.dart';
+import 'package:maternal_infant_care/data/repositories/fertility_profile_repository.dart';
+import 'package:maternal_infant_care/data/repositories/user_profile_repository.dart';
+import 'package:maternal_infant_care/data/models/fertility_profile_model.dart';
+import 'package:maternal_infant_care/presentation/viewmodels/auth_provider.dart';
 
 final pregnancyRepositoryProvider = FutureProvider<PregnancyRepository>((ref) async {
   final repo = PregnancyRepository();
@@ -91,6 +95,21 @@ final chatHistoryRepositoryProvider = FutureProvider<ChatHistoryRepository>((ref
   final repo = ChatHistoryRepository();
   await repo.init();
   return repo;
+});
+
+final fertilityProfileRepositoryProvider = Provider<FertilityProfileRepository>((ref) {
+  return FertilityProfileRepository();
+});
+
+final userProfileRepositoryProvider = Provider<UserProfileRepository>((ref) {
+  return UserProfileRepository();
+});
+
+final fertilityProfileProvider = FutureProvider<FertilityProfileModel?>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return null;
+  final repo = ref.watch(fertilityProfileRepositoryProvider);
+  return repo.fetchProfile(user.id);
 });
 
 final chatSessionsProvider = FutureProvider((ref) async {

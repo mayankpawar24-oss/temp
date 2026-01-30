@@ -82,14 +82,14 @@ class ProfilePage extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.secondaryContainer,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                profileType == UserProfileType.pregnant ? 'Expecting Mother' : 'Toddler Parent',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                child: Text(
+                  _profileLabel(profileType),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
             ),
             const SizedBox(height: 48),
             
@@ -211,5 +211,18 @@ class ProfilePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _profileLabel(UserProfileType? profileType) {
+    switch (profileType) {
+      case UserProfileType.pregnant:
+        return 'Expecting Mother';
+      case UserProfileType.tryingToConceive:
+        return 'Trying to Conceive';
+      case UserProfileType.toddlerParent:
+        return 'Toddler Parent';
+      default:
+        return 'Vatsalya Member';
+    }
   }
 }

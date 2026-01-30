@@ -428,7 +428,7 @@ Staying active is healthy for both you and your baby! It can improve mood, sleep
 *Always consult your doctor before starting any new exercise routine.*
 ''',
         ),
-         const ResourceArticleModel(
+        const ResourceArticleModel(
           id: 'preg5',
           title: 'Mental Wellness',
           description: 'Managing stress and emotions.',
@@ -506,6 +506,75 @@ If it hurts, break suction and try again. Don't hesitate to see a lactation cons
 *   Use a peri bottle for hygiene.
 *   Eat nourishing, warm meals.
 *   Gentle walking when ready.
+''',
+        ),
+      ];
+    }
+
+    if (type == UserProfileType.tryingToConceive) {
+      return [
+        const ResourceArticleModel(
+          id: 'ttc1',
+          title: 'Cycle Basics',
+          description: 'Understand phases and fertile windows.',
+          icon: Icons.calendar_today,
+          color: Color(0xFFB39DDB),
+          category: 'Fertility',
+          readingTime: '4 min',
+          content: '''
+# Understanding Your Cycle
+
+## The Phases
+* **Menstrual Phase:** Bleeding days (Day 1 begins your cycle).
+* **Follicular Phase:** Hormones prepare an egg to mature.
+* **Ovulation:** Egg release, typically ~14 days before your next period.
+* **Luteal Phase:** Progesterone rises to support implantation.
+
+## Fertile Window
+The fertile window is generally **5 days before ovulation** and **1 day after**.
+Tracking cycle length helps estimate this window.
+''',
+        ),
+        const ResourceArticleModel(
+          id: 'ttc2',
+          title: 'Ovulation Tracking',
+          description: 'Tools and signs to watch for.',
+          icon: Icons.favorite_border,
+          color: Color(0xFFF48FB1),
+          category: 'Tracking',
+          readingTime: '5 min',
+          content: '''
+# Ovulation Tracking
+
+## Common Signs
+* Increased cervical mucus (egg-white consistency)
+* Mild pelvic discomfort (mittelschmerz)
+* Slight rise in basal body temperature
+
+## Helpful Tools
+* **OPKs (Ovulation Predictor Kits)**
+* **Basal Body Temperature Tracking**
+* **Cycle Apps & Calendars**
+
+Consistency improves accuracy.
+''',
+        ),
+        const ResourceArticleModel(
+          id: 'ttc3',
+          title: 'Lifestyle for Fertility',
+          description: 'Nutrition, sleep, and stress tips.',
+          icon: Icons.spa_outlined,
+          color: Color(0xFFA5D6A7),
+          category: 'Wellness',
+          readingTime: '4 min',
+          content: '''
+# Lifestyle Support for Fertility
+
+* Maintain a balanced diet with whole grains, fruits, vegetables, and healthy fats.
+* Aim for 7–9 hours of sleep to support hormone balance.
+* Manage stress with gentle movement, meditation, or journaling.
+
+If you have concerns, consult a healthcare professional.
 ''',
         ),
       ];

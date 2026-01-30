@@ -24,9 +24,11 @@ class SmartReminderEngine {
 
     if (profileType == UserProfileType.pregnant) {
       reminders.addAll(await _generatePregnancyReminders());
-    } else {
+    } else if (profileType == UserProfileType.toddlerParent) {
       reminders.addAll(await _generateToddlerReminders());
     }
+
+    // No automatic reminders defined for trying-to-conceive yet
 
     return reminders;
   }

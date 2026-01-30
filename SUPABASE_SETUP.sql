@@ -1,6 +1,16 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Profiles Table
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID REFERENCES auth.users PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  role TEXT,
+  profile_type TEXT,
+  start_date TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Pregnancies Table
 CREATE TABLE IF NOT EXISTS pregnancies (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -149,6 +159,14 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 -- Reminders Table
 CREATE TABLE IF NOT EXISTS reminders (
+  -- Fertility Profiles Table (Trying to Conceive)
+  CREATE TABLE IF NOT EXISTS fertility_profiles (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    lmp_date DATE NOT NULL,
+    avg_cycle_length INTEGER NOT NULL,
+    cycle_regular BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
@@ -161,6 +179,7 @@ CREATE TABLE IF NOT EXISTS reminders (
 );
 
 -- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_profiles_id ON profiles(id);
 CREATE INDEX IF NOT EXISTS idx_pregnancies_user_id ON pregnancies(user_id);
 CREATE INDEX IF NOT EXISTS idx_growth_records_user_id ON growth_records(user_id);
 CREATE INDEX IF NOT EXISTS idx_feeding_records_user_id ON feeding_records(user_id);
@@ -174,8 +193,10 @@ CREATE INDEX IF NOT EXISTS idx_contractions_user_id ON contractions(user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_reminders_user_id ON reminders(user_id);
+CREATE INDEX IF NOT EXISTS idx_fertility_profiles_user_id ON fertility_profiles(user_id);
 
 -- Enable RLS (Row Level Security)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pregnancies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE growth_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feeding_records ENABLE ROW LEVEL SECURITY;
@@ -189,6 +210,13 @@ ALTER TABLE contractions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fertility_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Profiles RLS policies
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can delete own profile" ON profiles FOR DELETE USING (auth.uid() = id);
 
 -- Create RLS policies (users can only see their own data)
 CREATE POLICY "Users can view own pregnancies" ON pregnancies FOR SELECT USING (auth.uid() = user_id);
@@ -253,3 +281,9 @@ CREATE POLICY "Users can view own reminders" ON reminders FOR SELECT USING (auth
 CREATE POLICY "Users can insert own reminders" ON reminders FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own reminders" ON reminders FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "Users can delete own reminders" ON reminders FOR DELETE USING (auth.uid() = user_id);
+
+-- Fertility Profiles RLS policies
+CREATE POLICY "Users can view own fertility profile" ON fertility_profiles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own fertility profile" ON fertility_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own fertility profile" ON fertility_profiles FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own fertility profile" ON fertility_profiles FOR DELETE USING (auth.uid() = user_id);
