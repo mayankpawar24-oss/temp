@@ -77,7 +77,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -111,7 +111,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                 'Vatsalya',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                 textAlign: TextAlign.center,
               ),

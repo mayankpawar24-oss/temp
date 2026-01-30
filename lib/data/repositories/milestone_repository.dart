@@ -17,12 +17,48 @@ class MilestoneRepository {
 
     // Example milestones
     final defaults = [
-      MilestoneModel(id: 'm1', title: 'Smiles at people', category: 'social', ageMonthsMin: 2, ageMonthsMax: 2, description: "Your baby starts to smile at people."),
-      MilestoneModel(id: 'm2', title: 'Holds head steady', category: 'motor', ageMonthsMin: 2, ageMonthsMax: 2, description: "Holds head up without support."),
-      MilestoneModel(id: 'm3', title: 'Babbles', category: 'language', ageMonthsMin: 4, ageMonthsMax: 4, description: "Makes sounds like 'ba-ba'."),
-      MilestoneModel(id: 'm4', title: 'Rolls over', category: 'motor', ageMonthsMin: 4, ageMonthsMax: 6, description: "Rolls from tummy to back."),
-      MilestoneModel(id: 'm5', title: 'Sits without support', category: 'motor', ageMonthsMin: 6, ageMonthsMax: 8, description: "Can sit alone for a while."),
-      MilestoneModel(id: 'm6', title: 'Crawls', category: 'motor', ageMonthsMin: 7, ageMonthsMax: 10, description: "Moves around on hands and knees."),
+      MilestoneModel(
+          id: 'm1',
+          title: 'Smiles at people',
+          category: 'social',
+          ageMonthsMin: 2,
+          ageMonthsMax: 2,
+          description: 'Your baby starts to smile at people.'),
+      MilestoneModel(
+          id: 'm2',
+          title: 'Holds head steady',
+          category: 'motor',
+          ageMonthsMin: 2,
+          ageMonthsMax: 2,
+          description: 'Holds head up without support.'),
+      MilestoneModel(
+          id: 'm3',
+          title: 'Babbles',
+          category: 'language',
+          ageMonthsMin: 4,
+          ageMonthsMax: 4,
+          description: "Makes sounds like 'ba-ba'."),
+      MilestoneModel(
+          id: 'm4',
+          title: 'Rolls over',
+          category: 'motor',
+          ageMonthsMin: 4,
+          ageMonthsMax: 6,
+          description: 'Rolls from tummy to back.'),
+      MilestoneModel(
+          id: 'm5',
+          title: 'Sits without support',
+          category: 'motor',
+          ageMonthsMin: 6,
+          ageMonthsMax: 8,
+          description: 'Can sit alone for a while.'),
+      MilestoneModel(
+          id: 'm6',
+          title: 'Crawls',
+          category: 'motor',
+          ageMonthsMin: 7,
+          ageMonthsMax: 10,
+          description: 'Moves around on hands and knees.'),
     ];
 
     for (var m in defaults) {

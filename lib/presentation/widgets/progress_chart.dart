@@ -41,7 +41,10 @@ class ProgressChart extends StatelessWidget {
                     horizontalInterval: 1,
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
-                        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withOpacity(0.3),
                         strokeWidth: 1,
                       );
                     },
@@ -62,7 +65,10 @@ class ProgressChart extends StatelessWidget {
                           return Text(
                             value.toInt().toString(),
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
                               fontSize: 10,
                             ),
                           );
@@ -77,7 +83,10 @@ class ProgressChart extends StatelessWidget {
                           return Text(
                             value.toStringAsFixed(1),
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
                               fontSize: 10,
                             ),
                           );
@@ -88,13 +97,21 @@ class ProgressChart extends StatelessWidget {
                   borderData: FlBorderData(
                     show: true,
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withOpacity(0.3),
                     ),
                   ),
                   minX: 0,
-                  maxX: spots.isNotEmpty ? spots.map((e) => e.x).reduce((a, b) => a > b ? a : b) : 1,
+                  maxX: spots.isNotEmpty
+                      ? spots.map((e) => e.x).reduce((a, b) => a > b ? a : b)
+                      : 1,
                   minY: 0,
-                  maxY: spots.isNotEmpty ? spots.map((e) => e.y).reduce((a, b) => a > b ? a : b) * 1.2 : 1,
+                  maxY: spots.isNotEmpty
+                      ? spots.map((e) => e.y).reduce((a, b) => a > b ? a : b) *
+                          1.2
+                      : 1,
                   lineBarsData: [
                     LineChartBarData(
                       spots: spots,
@@ -104,7 +121,10 @@ class ProgressChart extends StatelessWidget {
                       dotData: const FlDotData(show: true),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.1),
                       ),
                     ),
                   ],

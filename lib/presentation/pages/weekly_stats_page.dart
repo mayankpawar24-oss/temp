@@ -5,6 +5,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
+import 'package:maternal_infant_care/data/models/kick_log_model.dart';
+import 'package:maternal_infant_care/data/models/contraction_model.dart';
+import 'package:maternal_infant_care/core/services/centralized_translations.dart';
 
 class WeeklyStatsPage extends ConsumerStatefulWidget {
   const WeeklyStatsPage({super.key});
@@ -14,7 +17,8 @@ class WeeklyStatsPage extends ConsumerStatefulWidget {
 }
 
 class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
-  DateTime _weekStart = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
+  DateTime _weekStart =
+      DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
 
   void _changeWeek(int weeks) {
     setState(() {
@@ -22,165 +26,87 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
     });
   }
 
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
   @override
   Widget build(BuildContext context) {
     final userMeta = ref.watch(userMetaProvider);
-    final feedingRepo = ref.watch(feedingRepositoryProvider);
-    final sleepRepo = ref.watch(sleepRepositoryProvider);
-    final diaperRepo = ref.watch(diaperRepositoryProvider);
-    final pregnantWeeklySummaryRepo = ref.watch(pregnantWeeklySummaryRepositoryProvider);
+    final isPregnant = userMeta.role == UserProfileType.pregnant;
+    final weekEnd = _weekStart.add(const Duration(days: 6));
+    final dateRangeText =
+        '${DateFormat('MMM d').format(_weekStart)} - ${DateFormat('MMM d, y').format(weekEnd)}';
 
-    // Show pregnancy view for pregnant users
-    if (userMeta.role == UserProfileType.pregnant) {
-      return _buildPregnantView(context, pregnantWeeklySummaryRepo);
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Tr('weekly_stats.title'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Stack(
+        children: [
+          // Theme-aware Background
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: _getBackgroundGradientColors(context),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                // Week Navigator
+                _buildWeekNavigator(context, dateRangeText, weekEnd),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: isPregnant
+                        ? _buildPregnancyWeeklyAnalysis(context)
+                        : _buildInfantWeeklyAnalysis(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Color> _getBackgroundGradientColors(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return [
+        const Color(0xFF1a1a2e),
+        const Color(0xFF16213e),
+      ];
+    } else {
+      return [
+        Theme.of(context).scaffoldBackgroundColor,
+        Theme.of(context).scaffoldBackgroundColor,
+      ];
     }
-
-    // Default toddler view
-    return _buildToddlerView(context, feedingRepo, sleepRepo, diaperRepo);
   }
 
-  Widget _buildPregnantView(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
-    final weekEnd = _weekStart.add(const Duration(days: 6));
-    final dateRangeText = '${DateFormat('MMM d').format(_weekStart)} - ${DateFormat('MMM d, y').format(weekEnd)}';
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text('Weekly Insights'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: const Color(0xFF455A64),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F5E9),
-                  Color(0xFFE3F2FD),
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildWeekNavigator(dateRangeText, _weekStart),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _buildPregnantWeeklyCard(context, pregnantSummaryRepo),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToddlerView(
-    BuildContext context,
-    AsyncValue<dynamic> feedingRepo,
-    AsyncValue<dynamic> sleepRepo,
-    AsyncValue<dynamic> diaperRepo,
-  ) {
-    final weekEnd = _weekStart.add(const Duration(days: 6));
-    final dateRangeText = '${DateFormat('MMM d').format(_weekStart)} - ${DateFormat('MMM d, y').format(weekEnd)}';
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text('Weekly Insights'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: const Color(0xFF455A64),
-      ),
-      body: Stack(
-        children: [
-          // Glassy Gradient Background
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F5E9), // Light Green
-                  Color(0xFFE3F2FD), // Light Blue
-                ],
-              ),
-            ),
-          ),
-          
-          SafeArea(
-            child: Column(
-              children: [
-                _buildWeekNavigator(dateRangeText, _weekStart),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        feedingRepo.when(
-                          data: (repo) => _buildChartCard(
-                            'Feeding (ml)',
-                            Colors.orange,
-                            _getFeedingData(repo, _weekStart),
-                          ),
-                          loading: () => const _LoadingChart(),
-                          error: (_, __) => const SizedBox.shrink(),
-                        ),
-                        const SizedBox(height: 16),
-                        sleepRepo.when(
-                          data: (repo) => _buildChartCard(
-                            'Sleep (hours)',
-                            Colors.indigo,
-                            _getSleepData(repo, _weekStart),
-                          ),
-                          loading: () => const _LoadingChart(),
-                          error: (_, __) => const SizedBox.shrink(),
-                        ),
-                        const SizedBox(height: 16),
-                        diaperRepo.when(
-                          data: (repo) => _buildChartCard(
-                            'Diapers',
-                            Colors.teal,
-                            _getDiaperData(repo, _weekStart),
-                          ),
-                          loading: () => const _LoadingChart(),
-                          error: (_, __) => const SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeekNavigator(String dateRangeText, DateTime weekStart) {
-    final weekEnd = weekStart.add(const Duration(days: 6));
+  Widget _buildWeekNavigator(
+      BuildContext context, String dateRangeText, DateTime weekEnd) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
+        color: theme.colorScheme.surface.withOpacity(0.7),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.8)),
+        border: Border.all(color: theme.colorScheme.secondary.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,220 +114,335 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, size: 18),
             onPressed: () => _changeWeek(-1),
-            color: Colors.blueGrey,
+            color: theme.colorScheme.primary,
           ),
-          Text(
-            dateRangeText,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueGrey[800],
+          Flexible(
+            child: Text(
+              dateRangeText,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios, size: 18),
-            onPressed: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
-                ? null 
+            onPressed: weekEnd
+                    .isAfter(DateTime.now().subtract(const Duration(days: 1)))
+                ? null
                 : () => _changeWeek(1),
-            color: weekEnd.isAfter(DateTime.now().subtract(const Duration(days: 1))) 
-                ? Colors.grey.withOpacity(0.3) 
-                : Colors.blueGrey,
+            color: weekEnd
+                    .isAfter(DateTime.now().subtract(const Duration(days: 1)))
+                ? theme.disabledColor
+                : theme.colorScheme.primary,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPregnantWeeklyCard(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
-    return pregnantSummaryRepo.when(
-      data: (repo) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.9)),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Weekly Pregnancy Progress',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Baby Movements This Week',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Active Days', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w600,
-                    )),
-                    Text('0 days', style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    )),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Symptom Trends',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.3)),
-                ),
-                child: Column(
-                  children: [
-                    _buildSymptomTrendRow(context, 'Fatigue', 5),
-                    const SizedBox(height: 12),
-                    _buildSymptomTrendRow(context, 'Nausea', 3),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Health Metrics',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3)),
-                ),
-                child: Column(
-                  children: [
-                    _buildMetricRow(context, 'Avg Water Intake', '1.5L / 2L'),
-                    const SizedBox(height: 12),
-                    _buildMetricRow(context, 'Vitamins Taken', '5 / 7 days'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const _LoadingChart(),
-      error: (_, __) => const SizedBox.shrink(),
+  Widget _buildPregnancyWeeklyAnalysis(BuildContext context) {
+    final kickRepo = ref.watch(kickLogRepositoryProvider);
+    final contractionRepo = ref.watch(contractionRepositoryProvider);
+
+    return Column(
+      children: [
+        // Baby Kicks Analysis
+        kickRepo.when(
+          data: (repo) {
+            final allKicks = repo.getHistory() as List<KickLogModel>;
+            final weeklyKicks = <double>[];
+            for (int i = 0; i < 7; i++) {
+              final date = _weekStart.add(Duration(days: i));
+              final dayKicks = allKicks
+                  .where((k) => _isSameDay(k.sessionStart, date))
+                  .toList();
+              final totalKicks =
+                  dayKicks.fold<int>(0, (sum, k) => sum + (k.kickCount ?? 0));
+              weeklyKicks.add(totalKicks.toDouble());
+            }
+            return _buildAnalysisCard(
+              context,
+              'Baby Kicks Trend',
+              weeklyKicks,
+              Colors.pink,
+              'kicks',
+            );
+          },
+          loading: () => const _LoadingChart(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 20),
+
+        // Contractions Analysis
+        contractionRepo.when(
+          data: (repo) {
+            final allContractions =
+                repo.getContractions() as List<ContractionModel>;
+            final weeklyContractions = <double>[];
+            for (int i = 0; i < 7; i++) {
+              final date = _weekStart.add(Duration(days: i));
+              final dayContractions = allContractions
+                  .where((c) => _isSameDay(c.startTime, date))
+                  .toList();
+              weeklyContractions.add(dayContractions.length.toDouble());
+            }
+            return _buildAnalysisCard(
+              context,
+              'Contractions Tracking',
+              weeklyContractions,
+              Colors.deepOrange,
+              'contractions',
+            );
+          },
+          loading: () => const _LoadingChart(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 20),
+
+        // Pregnancy Health Summary
+        _buildPregnancyHealthSummary(context),
+      ],
     );
   }
 
-  Widget _buildSymptomTrendRow(BuildContext context, String symptom, int count) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildInfantWeeklyAnalysis(BuildContext context) {
+    final feedingRepo = ref.watch(feedingRepositoryProvider);
+    final sleepRepo = ref.watch(sleepRepositoryProvider);
+    final diaperRepo = ref.watch(diaperRepositoryProvider);
+
+    return Column(
       children: [
-        Text(symptom, style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        )),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            '$count days',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        feedingRepo.when(
+          data: (repo) {
+            final feedingData = _getFeedingData(repo, _weekStart);
+            return _buildAnalysisCard(
+              context,
+              'Feeding (ml)',
+              feedingData,
+              Colors.orange,
+              'ml',
+            );
+          },
+          loading: () => const _LoadingChart(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 20),
+        sleepRepo.when(
+          data: (repo) {
+            final sleepData = _getSleepData(repo, _weekStart);
+            return _buildAnalysisCard(
+              context,
+              'Sleep (hours)',
+              sleepData,
+              Colors.indigo,
+              'hrs',
+            );
+          },
+          loading: () => const _LoadingChart(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 20),
+        diaperRepo.when(
+          data: (repo) {
+            final diaperData = _getDiaperData(repo, _weekStart);
+            return _buildAnalysisCard(
+              context,
+              'Diaper Changes',
+              diaperData,
+              Colors.teal,
+              'changes',
+            );
+          },
+          loading: () => const _LoadingChart(),
+          error: (_, __) => const SizedBox.shrink(),
         ),
       ],
     );
   }
 
-  Widget _buildMetricRow(BuildContext context, String metric, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(metric, style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        )),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<double> _getFeedingData(dynamic repo, DateTime start) {
-    List<double> data = [];
-    for (int i = 0; i < 7; i++) {
-      final date = start.add(Duration(days: i));
-      final feedings = repo.getFeedingsByDate(date);
-      final total = feedings.fold(0.0, (sum, item) => sum + (item.quantity as double));
-      data.add(total);
-    }
-    return data;
-  }
-
-  List<double> _getSleepData(dynamic repo, DateTime start) {
-    List<double> data = [];
-    for (int i = 0; i < 7; i++) {
-        final date = start.add(Duration(days: i));
-        data.add(repo.getTotalSleepHoursByDate(date));
-    }
-    return data;
-  }
-
-  List<double> _getDiaperData(dynamic repo, DateTime start) {
-    List<double> data = [];
-    for (int i = 0; i < 7; i++) {
-        final date = start.add(Duration(days: i));
-        data.add(repo.getDiapersByDate(date).length.toDouble());
-    }
-    return data;
-  }
-
-  Widget _buildChartCard(String title, Color color, List<double> weeklyData) {
-    final maxY = weeklyData.reduce((curr, next) => curr > next ? curr : next);
-    // Add some buffer to top of chart
-    final targetY = maxY == 0 ? 10.0 : maxY * 1.2;
+  Widget _buildPregnancyHealthSummary(BuildContext context) {
+    final theme = Theme.of(context);
+    final kickRepo = ref.watch(kickLogRepositoryProvider);
+    final contractionRepo = ref.watch(contractionRepositoryProvider);
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.9)),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.favorite,
+                    color: theme.colorScheme.primary, size: 18),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Weekly Health Summary',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          kickRepo.when(
+            data: (kickRepoData) {
+              final allKicks = kickRepoData.getHistory() as List<KickLogModel>;
+              final weeklyKicks = allKicks.where((k) {
+                final daysDiff = k.sessionStart.difference(_weekStart).inDays;
+                return daysDiff >= 0 && daysDiff < 7;
+              }).toList();
+              final totalKicks = weeklyKicks.fold<int>(
+                  0, (sum, k) => sum + (k.kickCount ?? 0));
+              final avgKicksPerSession = weeklyKicks.isNotEmpty
+                  ? (totalKicks / weeklyKicks.length).toStringAsFixed(1)
+                  : '0';
+
+              return _buildSummaryItem(
+                context,
+                'Total Baby Kicks',
+                '$totalKicks',
+                'Avg: $avgKicksPerSession per session',
+                Icons.favorite,
+                Colors.pink,
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 16),
+          contractionRepo.when(
+            data: (contractionRepoData) {
+              final allContractions = contractionRepoData.getContractions()
+                  as List<ContractionModel>;
+              final weeklyContractions = allContractions.where((c) {
+                final daysDiff = c.startTime.difference(_weekStart).inDays;
+                return daysDiff >= 0 && daysDiff < 7;
+              }).toList();
+
+              return _buildSummaryItem(
+                context,
+                'Contractions Recorded',
+                '${weeklyContractions.length}',
+                'Track them closely for patterns',
+                Icons.psychology,
+                Colors.deepOrange,
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 16),
+          _buildSummaryItem(
+            context,
+            'Hydration Goal',
+            '8-10',
+            'glasses per day recommended',
+            Icons.local_drink,
+            Colors.blue,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(
+    BuildContext context,
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+              Text(
+                value,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAnalysisCard(
+    BuildContext context,
+    String title,
+    List<double> weeklyData,
+    Color color,
+    String unit,
+  ) {
+    final theme = Theme.of(context);
+    final maxY = weeklyData.isNotEmpty
+        ? weeklyData.reduce((curr, next) => curr > next ? curr : next)
+        : 0.0;
+    final targetY = maxY == 0 ? 10.0 : maxY * 1.2;
+
+    // Calculate statistics
+    final avgValue = weeklyData.isEmpty
+        ? 0.0
+        : weeklyData.reduce((a, b) => a + b) / weeklyData.length;
+    final maxValue = maxY;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: color.withOpacity(0.1),
@@ -426,15 +467,33 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 16,
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey[800],
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          // Statistics Row
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatistic(context, 'Average',
+                    '${avgValue.toStringAsFixed(1)} $unit', color),
+              ),
+              Expanded(
+                child: _buildStatistic(context, 'Peak',
+                    '${maxValue.toStringAsFixed(1)} $unit', color),
+              ),
+              Expanded(
+                child: _buildStatistic(context, 'Days',
+                    '${weeklyData.where((v) => v > 0).length}/7', color),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
+          // Bar Chart
           SizedBox(
             height: 200,
             child: BarChart(
@@ -444,12 +503,12 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
                 barTouchData: BarTouchData(
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
-                    tooltipBgColor: Colors.blueGrey,
+                    tooltipBgColor: color,
                     tooltipPadding: const EdgeInsets.all(8),
                     tooltipMargin: 8,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       return BarTooltipItem(
-                        rod.toY.toStringAsFixed(1),
+                        '${rod.toY.toStringAsFixed(1)} $unit',
                         const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -464,19 +523,27 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        const days = [
+                          'Mon',
+                          'Tue',
+                          'Wed',
+                          'Thu',
+                          'Fri',
+                          'Sat',
+                          'Sun'
+                        ];
                         if (value.toInt() >= 0 && value.toInt() < days.length) {
-                           return Padding(
-                             padding: const EdgeInsets.only(top: 8.0),
-                             child: Text(
-                               days[value.toInt()],
-                               style: TextStyle(
-                                 color: Colors.blueGrey[400],
-                                 fontSize: 10,
-                                 fontWeight: FontWeight.bold,
-                               ),
-                             ),
-                           );
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              days[value.toInt()],
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.6),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
                         }
                         return const SizedBox.shrink();
                       },
@@ -487,27 +554,28 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                         if (value == 0) return const SizedBox.shrink();
-                         return Text(
-                           value.toInt().toString(),
-                           style: TextStyle(
-                             color: Colors.blueGrey[300], 
-                             fontSize: 10,
-                           ),
-                         );
+                        if (value == 0) return const SizedBox.shrink();
+                        return Text(
+                          value.toInt().toString(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        );
                       },
                       reservedSize: 30,
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: targetY / 5,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.blueGrey.withOpacity(0.1),
+                    color: theme.colorScheme.onSurface.withOpacity(0.1),
                     strokeWidth: 1,
                   ),
                 ),
@@ -518,9 +586,10 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
                     barRods: [
                       BarChartRodData(
                         toY: entry.value,
-                        color: color.withOpacity(0.7),
+                        color: color.withOpacity(0.8),
                         width: 14,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6)),
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
                           toY: targetY,
@@ -537,6 +606,67 @@ class _WeeklyStatsPageState extends ConsumerState<WeeklyStatsPage> {
       ),
     );
   }
+
+  Widget _buildStatistic(
+      BuildContext context, String label, String value, Color color) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<double> _getFeedingData(dynamic repo, DateTime start) {
+    List<double> data = [];
+    for (int i = 0; i < 7; i++) {
+      final date = start.add(Duration(days: i));
+      final feedings = repo.getFeedingsByDate(date);
+      final total =
+          feedings.fold(0.0, (sum, item) => sum + (item.quantity as double));
+      data.add(total);
+    }
+    return data;
+  }
+
+  List<double> _getSleepData(dynamic repo, DateTime start) {
+    List<double> data = [];
+    for (int i = 0; i < 7; i++) {
+      final date = start.add(Duration(days: i));
+      data.add(repo.getTotalSleepHoursByDate(date));
+    }
+    return data;
+  }
+
+  List<double> _getDiaperData(dynamic repo, DateTime start) {
+    List<double> data = [];
+    for (int i = 0; i < 7; i++) {
+      final date = start.add(Duration(days: i));
+      data.add(repo.getDiapersByDate(date).length.toDouble());
+    }
+    return data;
+  }
 }
 
 class _LoadingChart extends StatelessWidget {
@@ -544,10 +674,11 @@ class _LoadingChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      height: 250,
+      height: 300,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
       ),
       child: const Center(child: CircularProgressIndicator()),

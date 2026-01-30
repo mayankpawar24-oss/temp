@@ -9,7 +9,8 @@ class FeedingTrackingPage extends ConsumerStatefulWidget {
   const FeedingTrackingPage({super.key});
 
   @override
-  ConsumerState<FeedingTrackingPage> createState() => _FeedingTrackingPageState();
+  ConsumerState<FeedingTrackingPage> createState() =>
+      _FeedingTrackingPageState();
 }
 
 class _FeedingTrackingPageState extends ConsumerState<FeedingTrackingPage> {
@@ -44,7 +45,8 @@ class _FeedingTrackingPageState extends ConsumerState<FeedingTrackingPage> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: ${error.toString()}')),
+        error: (error, stack) =>
+            Center(child: Text('Error: ${error.toString()}')),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddFeedingDialog(context),
@@ -70,7 +72,7 @@ class _FeedingTrackingPageState extends ConsumerState<FeedingTrackingPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<String>(
-                  value: selectedType,
+                  initialValue: selectedType,
                   decoration: const InputDecoration(labelText: 'Type'),
                   items: AppConstants.feedingTypes.map((type) {
                     return DropdownMenuItem(value: type, child: Text(type));
@@ -90,7 +92,8 @@ class _FeedingTrackingPageState extends ConsumerState<FeedingTrackingPage> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: notesController,
-                  decoration: const InputDecoration(labelText: 'Notes (optional)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Notes (optional)'),
                   maxLines: 3,
                 ),
               ],
@@ -117,7 +120,9 @@ class _FeedingTrackingPageState extends ConsumerState<FeedingTrackingPage> {
                     timestamp: DateTime.now(),
                     type: selectedType,
                     quantity: double.parse(quantityController.text),
-                    notes: notesController.text.isEmpty ? null : notesController.text,
+                    notes: notesController.text.isEmpty
+                        ? null
+                        : notesController.text,
                   );
                   await repo.saveFeeding(feeding);
 
@@ -158,12 +163,12 @@ class _TodaySummaryCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.tertiary,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.tertiary,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -175,7 +180,11 @@ class _TodaySummaryCard extends StatelessWidget {
               value: '${totalQuantity.toStringAsFixed(0)}ml',
               color: Theme.of(context).colorScheme.onPrimary,
             ),
-            Container(width: 1, height: 40, color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.3)),
+            Container(
+                width: 1,
+                height: 40,
+                color:
+                    Theme.of(context).colorScheme.onPrimary.withOpacity(0.3)),
             _StatColumn(
               label: 'Sessions',
               value: '${feedings.length}',
@@ -267,7 +276,8 @@ class _FeedingItemCard extends StatelessWidget {
         ),
         title: Text(
           feeding.type,
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,19 +285,22 @@ class _FeedingItemCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '${feeding.quantity}${feeding.unit} • ${DateFormat('hh:mm a').format(feeding.timestamp)}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
             ),
             if (feeding.notes != null) ...[
               const SizedBox(height: 4),
               Text(
                 feeding.notes!,
-                style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(fontStyle: FontStyle.italic),
               ),
             ],
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.delete_outline, color: theme.colorScheme.error.withOpacity(0.6)),
+          icon: Icon(Icons.delete_outline,
+              color: theme.colorScheme.error.withOpacity(0.6)),
           onPressed: () async {
             try {
               await repo.deleteFeeding(feeding.id);

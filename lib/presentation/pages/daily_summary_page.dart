@@ -4,10 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
-import 'package:maternal_infant_care/presentation/viewmodels/pregnancy_insights_viewmodel.dart';
 import 'package:maternal_infant_care/data/models/feeding_model.dart';
 import 'package:maternal_infant_care/data/models/sleep_model.dart';
 import 'package:maternal_infant_care/data/models/diaper_model.dart';
+import 'package:maternal_infant_care/data/models/kick_log_model.dart';
+import 'package:maternal_infant_care/data/models/contraction_model.dart';
 
 class DailySummaryPage extends ConsumerStatefulWidget {
   const DailySummaryPage({super.key});
@@ -51,28 +52,419 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
     }
   }
 
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  Widget _buildPregnancySummaryCards(
+    BuildContext context,
+    AsyncValue<dynamic> kickRepo,
+    AsyncValue<dynamic> contractionRepo,
+  ) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: kickRepo.when(
+                data: (repo) {
+                  final allKicks = repo.getHistory() as List<KickLogModel>;
+                  final todayKicks = allKicks
+                      .where((k) => _isSameDay(k.sessionStart, _selectedDate))
+                      .toList();
+                  final totalCount = todayKicks.fold<int>(
+                      0, (sum, k) => sum + (k.kickCount ?? 0));
+                  return _StatCard(
+                    title: 'Baby Kicks',
+                    value: '$totalCount',
+                    subtitle: '${todayKicks.length} sessions',
+                    icon: Icons.favorite,
+                    color: theme.colorScheme.primary,
+                  );
+                },
+                loading: () => const _LoadingCard(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: contractionRepo.when(
+                data: (repo) {
+                  final allContractions =
+                      repo.getContractions() as List<ContractionModel>;
+                  final todayContractions = allContractions
+                      .where((c) => _isSameDay(c.startTime, _selectedDate))
+                      .toList();
+                  return _StatCard(
+                    title: 'Contractions',
+                    value: '${todayContractions.length}',
+                    subtitle: 'Tracked today',
+                    icon: Icons.psychology,
+                    color: theme.colorScheme.secondary,
+                  );
+                },
+                loading: () => const _LoadingCard(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: theme.colorScheme.tertiary.withOpacity(0.5)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.tertiary.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.tertiary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.local_drink,
+                              color: theme.colorScheme.tertiary, size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Hydration',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.8),
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '8-10',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.tertiary,
+                      ),
+                    ),
+                    Text(
+                      'glasses/day',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.deepOrange.withOpacity(0.5)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepOrange.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.deepOrange.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.directions_walk,
+                              color: Colors.deepOrange, size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Activity',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.8),
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '30-40',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                    Text(
+                      'minutes',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPregnancyInsights(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.lightbulb,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Today\'s Pregnancy Insights',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildInsightItem(context, 'Fetal Movement',
+              'Track at least 10 kicks within 2 hours in the morning and evening'),
+          const SizedBox(height: 8),
+          _buildInsightItem(context, 'Blood Pressure',
+              'Monitor regularly - normal range: 90-140 / 60-90 mmHg'),
+          const SizedBox(height: 8),
+          _buildInsightItem(context, 'Nutrition',
+              'Eat 5 small meals with iron-rich foods and prenatal vitamins'),
+          const SizedBox(height: 8),
+          _buildInsightItem(
+              context, 'Rest', 'Aim for 8-10 hours of quality sleep at night'),
+          const SizedBox(height: 8),
+          _buildInsightItem(context, 'Mood Check',
+              'How are you feeling today? Log any concerns for your doctor'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInsightItem(
+      BuildContext context, String title, String description) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.75),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPregnancyTimeline(
+    BuildContext context,
+    AsyncValue<dynamic> kickRepo,
+    AsyncValue<dynamic> contractionRepo,
+  ) {
+    List<_TimelineEvent> events = [];
+    final theme = Theme.of(context);
+
+    // Combine pregnancy-specific data
+    if (kickRepo.hasValue) {
+      final allKicks = kickRepo.value!.getHistory() as List<KickLogModel>;
+      final todayKicks = allKicks
+          .where((k) => _isSameDay(k.sessionStart, _selectedDate))
+          .toList();
+      events.addAll(todayKicks.map((k) => _TimelineEvent(
+            time: k.sessionStart,
+            title: 'Baby Movement Session',
+            description:
+                '${k.kickCount ?? 0} kicks in ${k.sessionEnd.difference(k.sessionStart).inMinutes} mins',
+            icon: Icons.favorite,
+            color: theme.colorScheme.primary,
+          )));
+    }
+
+    if (contractionRepo.hasValue) {
+      final allContractions =
+          contractionRepo.value!.getContractions() as List<ContractionModel>;
+      final todayContractions = allContractions
+          .where((c) => _isSameDay(c.startTime, _selectedDate))
+          .toList();
+      events.addAll(todayContractions.map((c) => _TimelineEvent(
+            time: c.startTime,
+            title: 'Contraction Recorded',
+            description:
+                'Duration: ${c.endTime != null ? c.endTime!.difference(c.startTime).inSeconds : "N/A"} seconds',
+            icon: Icons.psychology,
+            color: theme.colorScheme.secondary,
+          )));
+    }
+
+    // Sort by time descending (newest first)
+    events.sort((a, b) => b.time.compareTo(a.time));
+
+    if (events.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+          border:
+              Border.all(color: theme.colorScheme.secondary.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.history_edu,
+                size: 48, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+            const SizedBox(height: 16),
+            Text(
+              'No activities logged for this day',
+              style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: events.length,
+      itemBuilder: (context, index) {
+        final event = events[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: event.color.withOpacity(0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: event.color.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: event.color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(event.icon, color: event.color, size: 20),
+            ),
+            title: Text(
+              event.title,
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            subtitle: Text(event.description),
+            trailing: Text(
+              DateFormat('h:mm a').format(event.time),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userMeta = ref.watch(userMetaProvider);
-    final feedingRepo = ref.watch(feedingRepositoryProvider);
-    final sleepRepo = ref.watch(sleepRepositoryProvider);
-    final diaperRepo = ref.watch(diaperRepositoryProvider);
-    final pregnantDailySummaryRepo = ref.watch(pregnantDailySummaryRepositoryProvider);
+    final isPregnant = userMeta.role == UserProfileType.pregnant;
 
-    // Show pregnancy view for pregnant users
-    if (userMeta.role == UserProfileType.pregnant) {
-      return _buildPregnantView(context, pregnantDailySummaryRepo);
+    if (isPregnant) {
+      return _buildPregnancyDailySummary(context);
+    } else {
+      return _buildInfantDailySummary(context);
     }
-
-    // Default toddler view
-    return _buildToddlerView(context, feedingRepo, sleepRepo, diaperRepo);
   }
 
-  Widget _buildPregnantView(BuildContext context, AsyncValue<dynamic> pregnantSummaryRepo) {
+  Widget _buildPregnancyDailySummary(BuildContext context) {
+    final kickRepo = ref.watch(kickLogRepositoryProvider);
+    final contractionRepo = ref.watch(contractionRepositoryProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Daily Summary'),
+        title: const Text('Daily Summary - Pregnancy Journey'),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -86,7 +478,9 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
       ),
       body: Stack(
         children: [
-          Container(color: Theme.of(context).scaffoldBackgroundColor),
+          Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
           SafeArea(
             child: Column(
               children: [
@@ -97,9 +491,24 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPregnantSummaryCards(context),
+                        _buildPregnancySummaryCards(
+                            context, kickRepo, contractionRepo),
                         const SizedBox(height: 24),
-                        _buildPregnantHealthInsights(context),
+                        _buildPregnancyInsights(context),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Daily Activity Timeline',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildPregnancyTimeline(
+                            context, kickRepo, contractionRepo),
                       ],
                     ),
                   ),
@@ -112,12 +521,11 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
     );
   }
 
-  Widget _buildToddlerView(
-    BuildContext context,
-    AsyncValue<dynamic> feedingRepo,
-    AsyncValue<dynamic> sleepRepo,
-    AsyncValue<dynamic> diaperRepo,
-  ) {
+  Widget _buildInfantDailySummary(BuildContext context) {
+    final feedingRepo = ref.watch(feedingRepositoryProvider);
+    final sleepRepo = ref.watch(sleepRepositoryProvider);
+    final diaperRepo = ref.watch(diaperRepositoryProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -135,7 +543,11 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
       ),
       body: Stack(
         children: [
-          Container(color: Theme.of(context).scaffoldBackgroundColor),
+          // Parchment background
+          Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+          ),
+
           SafeArea(
             child: Column(
               children: [
@@ -146,17 +558,22 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSummaryCards(context, feedingRepo, sleepRepo, diaperRepo),
+                        _buildSummaryCards(
+                            context, feedingRepo, sleepRepo, diaperRepo),
                         const SizedBox(height: 24),
                         Text(
                           'Timeline',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 12),
-                        _buildTimeline(context, feedingRepo, sleepRepo, diaperRepo),
+                        _buildTimeline(
+                            context, feedingRepo, sleepRepo, diaperRepo),
                       ],
                     ),
                   ),
@@ -176,7 +593,8 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.5)),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.secondary.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -189,9 +607,9 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
           Text(
             DateFormat('EEEE, MMM d, y').format(_selectedDate),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward_ios, size: 18),
@@ -200,9 +618,9 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
                     _selectedDate.year == DateTime.now().year
                 ? null
                 : () => _changeDate(1),
-            color: _selectedDate.day == DateTime.now().day 
-              ? Theme.of(context).disabledColor 
-              : Theme.of(context).colorScheme.primary,
+            color: _selectedDate.day == DateTime.now().day
+                ? Theme.of(context).disabledColor
+                : Theme.of(context).colorScheme.primary,
           ),
         ],
       ),
@@ -224,7 +642,8 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
               child: feedingRepo.when(
                 data: (repo) {
                   final feedings = repo.getFeedingsByDate(_selectedDate);
-                  final totalMl = feedings.fold(0.0, (sum, f) => sum + f.quantity);
+                  final totalMl =
+                      feedings.fold(0.0, (sum, f) => sum + f.quantity);
                   return _StatCard(
                     title: 'Feeding',
                     value: '${feedings.length}',
@@ -277,7 +696,7 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
             ),
             const SizedBox(width: 12),
             // Placeholder for future metric or filler
-            const Expanded(child: SizedBox.shrink()), 
+            const Expanded(child: SizedBox.shrink()),
           ],
         ),
       ],
@@ -295,7 +714,8 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
 
     // Combine data
     if (feedingRepo.hasValue) {
-      final feedings = feedingRepo.value!.getFeedingsByDate(_selectedDate) as List<FeedingModel>;
+      final feedings = feedingRepo.value!.getFeedingsByDate(_selectedDate)
+          as List<FeedingModel>;
       events.addAll(feedings.map((f) => _TimelineEvent(
             time: f.timestamp,
             title: 'Feeding',
@@ -306,7 +726,8 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
     }
 
     if (sleepRepo.hasValue) {
-      final sleep = sleepRepo.value!.getSleepsByDate(_selectedDate) as List<SleepModel>;
+      final sleep =
+          sleepRepo.value!.getSleepsByDate(_selectedDate) as List<SleepModel>;
       events.addAll(sleep.map((s) => _TimelineEvent(
             time: s.startTime,
             title: 'Sleep Started',
@@ -314,17 +735,19 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
             icon: Icons.bedtime,
             color: theme.colorScheme.tertiary,
           )));
-      events.addAll(sleep.where((s) => s.endTime != null).map((s) => _TimelineEvent(
-            time: s.endTime!,
-            title: 'Woke Up',
-            description: 'Duration: ${s.hours.toStringAsFixed(1)}h',
-            icon: Icons.wb_sunny_outlined,
-            color: theme.colorScheme.secondary,
-          )));
+      events.addAll(
+          sleep.where((s) => s.endTime != null).map((s) => _TimelineEvent(
+                time: s.endTime!,
+                title: 'Woke Up',
+                description: 'Duration: ${s.hours.toStringAsFixed(1)}h',
+                icon: Icons.wb_sunny_outlined,
+                color: theme.colorScheme.secondary,
+              )));
     }
 
     if (diaperRepo.hasValue) {
-      final diapers = diaperRepo.value!.getDiapersByDate(_selectedDate) as List<DiaperModel>;
+      final diapers = diaperRepo.value!.getDiapersByDate(_selectedDate)
+          as List<DiaperModel>;
       events.addAll(diapers.map((d) => _TimelineEvent(
             time: d.timestamp,
             title: 'Diaper Change',
@@ -344,15 +767,18 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface.withOpacity(0.5),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: theme.colorScheme.secondary.withOpacity(0.3)),
+          border:
+              Border.all(color: theme.colorScheme.secondary.withOpacity(0.3)),
         ),
         child: Column(
           children: [
-            Icon(Icons.history_edu, size: 48, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+            Icon(Icons.history_edu,
+                size: 48, color: theme.colorScheme.onSurface.withOpacity(0.3)),
             const SizedBox(height: 16),
             Text(
               'No activities logged for this day',
-              style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+              style: TextStyle(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
             ),
           ],
         ),
@@ -390,10 +816,8 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
             ),
             title: Text(
               event.title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15
-              ),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             subtitle: Text(event.description),
             trailing: Text(
@@ -407,163 +831,6 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
         );
       },
     );
-  }
-
-  Widget _buildPregnantSummaryCards(BuildContext context) {
-    final theme = Theme.of(context);
-    final pregnancyData = ref.watch(pregnancyRepositoryProvider);
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: pregnancyData.when(
-                data: (repo) {
-                  final pregnancy = repo.getPregnancy();
-                  return _StatCard(
-                    title: 'Gestational Age',
-                    value: '${pregnancy?.weeksPregnant ?? 0}w',
-                    subtitle: '${(pregnancy?.weeksPregnant ?? 0) * 7} days',
-                    icon: Icons.favorite,
-                    color: theme.colorScheme.primary,
-                  );
-                },
-                loading: () => const _LoadingCard(),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: pregnancyData.when(
-                data: (repo) {
-                  final pregnancy = repo.getPregnancy();
-                  final trimester = ((pregnancy?.weeksPregnant ?? 0) ~/ 13) + 1;
-                  return _StatCard(
-                    title: 'Trimester',
-                    value: 'T$trimester',
-                    subtitle: 'Current trimester',
-                    icon: Icons.child_care,
-                    color: theme.colorScheme.secondary,
-                  );
-                },
-                loading: () => const _LoadingCard(),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPregnantHealthInsights(BuildContext context) {
-    final insightsProvider = ref.watch(pregnancyInsightsViewModelProvider);
-
-    return insightsProvider.when(
-      data: (insights) {
-        if (insights == null) {
-          return const SizedBox.shrink();
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Daily Health Insights',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildInsightCard(context, 'Hydration', insights.waterIntake.status, insights.waterIntake.message, Icons.local_drink),
-            const SizedBox(height: 12),
-            _buildInsightCard(context, 'Baby Movement', insights.babyMovement.status, insights.babyMovement.message, Icons.favorite),
-            const SizedBox(height: 12),
-            _buildInsightCard(context, 'Symptoms', insights.symptoms.status, insights.symptoms.message, Icons.health_and_safety),
-            const SizedBox(height: 12),
-            _buildInsightCard(context, 'Prenatal Vitamins', insights.vitamins.status, insights.vitamins.message, Icons.medication),
-          ],
-        );
-      },
-      loading: () => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, st) => Text(
-        'Unable to calculate insights: ${error.toString()}',
-        style: TextStyle(color: Colors.red),
-      ),
-    );
-  }
-
-  Widget _buildInsightCard(
-    BuildContext context,
-    String title,
-    InsightStatus status,
-    String message,
-    IconData icon,
-  ) {
-    final theme = Theme.of(context);
-    final (statusColor, statusEmoji) = _getStatusDisplay(status);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: statusColor.withOpacity(0.4)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: statusColor, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '$statusEmoji $title',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: statusColor,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 40),
-            child: Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.8),
-              ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  (Color, String) _getStatusDisplay(InsightStatus status) {
-    return switch (status) {
-      InsightStatus.good => (Colors.green.shade600, '🟢'),
-      InsightStatus.warning => (Colors.orange.shade600, '🟡'),
-      InsightStatus.alert => (Colors.red.shade600, '🔴'),
-    };
   }
 }
 
@@ -615,9 +882,11 @@ class _StatCard extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                  fontWeight: FontWeight.bold
-                ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.8),
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -625,16 +894,17 @@ class _StatCard extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
           ),
           Text(
             subtitle,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-            ),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
           ),
         ],
       ),

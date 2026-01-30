@@ -66,7 +66,7 @@ class SupabaseGrowthRepository {
           .eq('age_in_days', ageInDays)
           .single();
 
-      return _mapToGrowthModel(response as Map<String, dynamic>);
+      return _mapToGrowthModel(response);
     } catch (e) {
       return null;
     }

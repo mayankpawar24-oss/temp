@@ -42,9 +42,9 @@ class _VatsalyaAiPageState extends ConsumerState<VatsalyaAiPage> {
 
     _messageController.clear();
     setState(() => _isLoading = true);
-    
+
     await ref.read(aiResponseProvider.notifier).sendMessage(text);
-    
+
     if (mounted) {
       setState(() => _isLoading = false);
       _scrollToBottom();
@@ -64,14 +64,15 @@ class _VatsalyaAiPageState extends ConsumerState<VatsalyaAiPage> {
         leading: IconButton(
           icon: const Icon(Icons.history),
           onPressed: () {
-             _scaffoldKey.currentState?.openDrawer();
+            _scaffoldKey.currentState?.openDrawer();
           },
           tooltip: 'Chat History',
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => ref.read(aiResponseProvider.notifier).startNewSession(),
+            onPressed: () =>
+                ref.read(aiResponseProvider.notifier).startNewSession(),
             tooltip: 'New Chat',
           ),
         ],
@@ -94,7 +95,7 @@ class _VatsalyaAiPageState extends ConsumerState<VatsalyaAiPage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: LinearProgressIndicator(
-                backgroundColor: colorScheme.surfaceVariant,
+                backgroundColor: colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
               ),
             ),
@@ -170,10 +171,12 @@ class _VatsalyaAiPageState extends ConsumerState<VatsalyaAiPage> {
                 style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Type your question...',
-                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
+                  hintStyle:
+                      TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2)),
+                    borderSide:
+                        BorderSide(color: colorScheme.outline.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -181,18 +184,22 @@ class _VatsalyaAiPageState extends ConsumerState<VatsalyaAiPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2)),
+                    borderSide:
+                        BorderSide(color: colorScheme.outline.withOpacity(0.2)),
                   ),
                   filled: true,
                   fillColor: colorScheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
                 onSubmitted: (_) => _handleSendMessage(),
               ),
             ),
             const SizedBox(width: 12),
             IconButton.filled(
-              style: IconButton.styleFrom(backgroundColor: colorScheme.primary, foregroundColor: colorScheme.onPrimary),
+              style: IconButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary),
               onPressed: _isLoading ? null : _handleSendMessage,
               icon: const Icon(Icons.send),
             ),
@@ -216,50 +223,56 @@ class _ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser)
             CircleAvatar(
               backgroundColor: colorScheme.primary.withOpacity(0.1),
-              child: Icon(Icons.auto_awesome, size: 20, color: colorScheme.primary),
+              child: Icon(Icons.auto_awesome,
+                  size: 20, color: colorScheme.primary),
             ),
           if (!isUser) const SizedBox(width: 8),
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isUser 
-                    ? colorScheme.primary 
-                    : (message.isError ? colorScheme.errorContainer : colorScheme.surface),
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: isUser ? const Radius.circular(16) : Radius.zero,
-                  bottomRight: isUser ? Radius.zero : const Radius.circular(16),
-                ),
-                border: !isUser && !message.isError 
-                  ? Border.all(color: colorScheme.outline.withOpacity(0.1)) 
-                  : null,
-                boxShadow: [
-                  if (!isUser)
-                    BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                ]
-              ),
+                  color: isUser
+                      ? colorScheme.primary
+                      : (message.isError
+                          ? colorScheme.errorContainer
+                          : colorScheme.surface),
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    topRight: const Radius.circular(16),
+                    bottomLeft:
+                        isUser ? const Radius.circular(16) : Radius.zero,
+                    bottomRight:
+                        isUser ? Radius.zero : const Radius.circular(16),
+                  ),
+                  border: !isUser && !message.isError
+                      ? Border.all(color: colorScheme.outline.withOpacity(0.1))
+                      : null,
+                  boxShadow: [
+                    if (!isUser)
+                      BoxShadow(
+                        color: colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                  ]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   if (message.isError)
+                  if (message.isError)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.error_outline, size: 14, color: colorScheme.error),
+                          Icon(Icons.error_outline,
+                              size: 14, color: colorScheme.error),
                           const SizedBox(width: 4),
                           Text(
                             'Error',
@@ -275,9 +288,11 @@ class _ChatBubble extends StatelessWidget {
                   Text(
                     message.text,
                     style: TextStyle(
-                      color: isUser 
-                          ? colorScheme.onPrimary 
-                          : (message.isError ? colorScheme.onErrorContainer : colorScheme.onSurface),
+                      color: isUser
+                          ? colorScheme.onPrimary
+                          : (message.isError
+                              ? colorScheme.onErrorContainer
+                              : colorScheme.onSurface),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -285,7 +300,10 @@ class _ChatBubble extends StatelessWidget {
                     DateFormat('hh:mm a').format(message.timestamp),
                     style: TextStyle(
                       fontSize: 10,
-                      color: (isUser ? colorScheme.onPrimary : colorScheme.onSurface).withOpacity(0.6),
+                      color: (isUser
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurface)
+                          .withOpacity(0.6),
                     ),
                   ),
                 ],

@@ -154,7 +154,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Create Account'),
         backgroundColor: Colors.transparent,
@@ -226,7 +226,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
-                      .surfaceVariant
+                      .surfaceContainerHighest
                       .withOpacity(0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -331,7 +331,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? theme.colorScheme.primaryContainer
-                      : theme.colorScheme.surfaceVariant,
+                      : theme.colorScheme.surfaceContainerHighest,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
