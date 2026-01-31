@@ -127,34 +127,58 @@ class NotificationService {
     required DateTime scheduledDate,
     String? channelId,
   }) async {
-    print('🔔 NOTIFICATION DEBUG: scheduleNotification called. Date: $scheduledDate');
+    print('🔔 NOTIFICATION DEBUG: scheduleNotification called. ID: $id, Title: $title, Date: $scheduledDate');
     try {
-      if (scheduledDate.isBefore(DateTime.now())) {
+      var adjustedDate = scheduledDate;
+      if (adjustedDate.isBefore(DateTime.now())) {
         print('🔔 NOTIFICATION DEBUG: Date is in past, shifting 5 seconds forward');
-        scheduledDate = DateTime.now().add(const Duration(seconds: 5));
+        adjustedDate = DateTime.now().add(const Duration(seconds: 5));
       }
+
+      // Convert to TZDateTime
+      final tzDateTime = tz.TZDateTime.from(adjustedDate, tz.local);
+      
+      print('🔔 NOTIFICATION DEBUG: Scheduling for $tzDateTime (Local timezone)');
 
       await _notifications.zonedSchedule(
         id,
         title,
         body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
+        tzDateTime,
         NotificationDetails(
           android: AndroidNotificationDetails(
             channelId ?? 'high_importance_channel',
             'Urgent Alerts',
+            channelDescription: 'Scheduled reminders and notifications',
             importance: Importance.max,
             priority: Priority.high,
             icon: '@mipmap/ic_launcher',
+            enableVibration: true,
+            playSound: true,
+            sound: const RawResourceAndroidNotificationSound('notification'),
+            // Ensure notification persists even if device is low on memory
+            autoCancel: true,
+            tag: 'reminder_$id',
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time, // Repeat daily if same time
       );
-      print('🔔 NOTIFICATION DEBUG: .zonedSchedule() command sent to system');
-    } catch (e) {
+      print('🔔 NOTIFICATION DEBUG: ✅ Notification scheduled successfully! ID: $id');
+      
+      // Verify it was scheduled
+      final pending = await _notifications.pendingNotificationRequests();
+      final scheduled = pending.where((r) => r.id == id).isNotEmpty;
+      print('🔔 NOTIFICATION DEBUG: Pending verification - Scheduled: $scheduled (Total pending: ${pending.length})');
+    } catch (e, stack) {
       print('❌ NOTIFICATION ERROR during schedule: $e');
+      print('❌ STACK TRACE: $stack');
     }
   }
 
@@ -167,18 +191,10 @@ class NotificationService {
     await showInstantNotification(id: id, title: title, body: body, channelId: channelId);
   }
 
-  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
-    try {
-      return await _notifications.pendingNotificationRequests();
-    } catch (e) {
-      print('❌ NOTIFICATION ERROR fetching pending: $e');
-      return [];
-    }
-  }
-
   static Future<void> cancelNotification(int id) async {
     try {
       await _notifications.cancel(id);
+      print('🔔 NOTIFICATION DEBUG: Notification $id cancelled');
     } catch (e) {
       print('❌ NOTIFICATION ERROR during cancel: $e');
     }
@@ -187,8 +203,23 @@ class NotificationService {
   static Future<void> cancelAll() async {
     try {
       await _notifications.cancelAll();
+      print('🔔 NOTIFICATION DEBUG: All notifications cancelled');
     } catch (e) {
       print('❌ NOTIFICATION ERROR during cancelAll: $e');
+    }
+  }
+
+  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    try {
+      final pending = await _notifications.pendingNotificationRequests();
+      print('🔔 NOTIFICATION DEBUG: ${pending.length} pending notifications');
+      for (var notification in pending) {
+        print('   - ID: ${notification.id}, Title: ${notification.title}');
+      }
+      return pending;
+    } catch (e) {
+      print('❌ NOTIFICATION ERROR fetching pending: $e');
+      return [];
     }
   }
 }

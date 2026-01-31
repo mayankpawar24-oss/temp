@@ -44,28 +44,45 @@ class ParentingWisdomPage extends ConsumerWidget {
 
                       final now = DateTime.now();
                       final ageMonths = _calculateAgeMonths(birthDate, now);
-                      final today = DateTime(now.year, now.month, now.day);
+                      final sevenDaysAgo = now.subtract(const Duration(days: 7));
 
+                      // Check for ANY data in last 7 days
+                      final recentFeeding = feedingRepo.getAllFeedings()
+                          .where((f) => f.timestamp.isAfter(sevenDaysAgo))
+                          .toList();
+                      final recentSleep = sleepRepo.getAllSleeps()
+                          .where((s) => s.startTime.isAfter(sevenDaysAgo))
+                          .toList();
+                      final recentDiaper = diaperRepo.getAllDiapers()
+                          .where((d) => d.timestamp.isAfter(sevenDaysAgo))
+                          .toList();
+                      
+                      final hasAnyData = recentFeeding.isNotEmpty || 
+                                        recentSleep.isNotEmpty || 
+                                        recentDiaper.isNotEmpty;
+
+                      // CRITICAL: Always compute insights if ANY data exists
+                      if (!hasAnyData) {
+                        return _buildFallbackWithAction(
+                          context,
+                          'Log feeding, sleep, and diaper data to receive evidence-based insights for शैशव अवस्था (early childhood) development.',
+                        );
+                      }
+
+                      // Compute insights based on available data
+                      final today = DateTime(now.year, now.month, now.day);
                       final feedingCount = feedingRepo.getFeedingsByDate(today).length;
                       final sleepHours = sleepRepo.getTotalSleepHoursByDate(today);
                       final diaperCount = diaperRepo.getDiapersByDate(today).length;
                       final latestGrowth = growthRepo.getLatestGrowth();
                       final hasRecentGrowth = latestGrowth != null && now.difference(latestGrowth.timestamp).inDays <= 30;
 
-                      final hasEnoughData = (feedingCount + diaperCount + (sleepHours > 0 ? 1 : 0)) >= 2 || hasRecentGrowth;
-                      if (!hasEnoughData) {
-                        return _buildFallbackWithAction(
-                          context,
-                          'Log daily activities to receive personalized parenting insights.',
-                        );
-                      }
-
                       final sleepRange = _sleepRangeForAge(ageMonths);
                       final sleepInsight = _buildSleepInsight(sleepHours, sleepRange);
                       final feedingInsight = _buildFeedingInsight(feedingCount);
                       final activityInsight = _buildActivityInsight(diaperCount);
                       final growthInsight = hasRecentGrowth
-                          ? 'Recent वृद्धि (growth) log recorded in the past 30 days.'
+                          ? 'Recent वृद्धि (growth) recorded within the last 30 days.'
                           : null;
 
                       return SingleChildScrollView(
@@ -259,12 +276,12 @@ class ParentingWisdomPage extends ConsumerWidget {
       return 'Sleep logs are missing for today.';
     }
     if (sleepHours < range.min) {
-      return 'Sleep duration is below the typical range for this age.';
+      return 'Today’s sleep: ${sleepHours.toStringAsFixed(1)} hrs (below the ${range.min.toStringAsFixed(0)}–${range.max.toStringAsFixed(0)} hr range).';
     }
     if (sleepHours > range.max) {
-      return 'Sleep duration is above the typical range; observe daytime energy.';
+      return 'Today’s sleep: ${sleepHours.toStringAsFixed(1)} hrs (above the ${range.min.toStringAsFixed(0)}–${range.max.toStringAsFixed(0)} hr range).';
     }
-    return 'Sleep duration appears within the expected range for this age.';
+    return 'Today’s sleep: ${sleepHours.toStringAsFixed(1)} hrs (within the expected range).';
   }
 
   String _buildFeedingInsight(int feedingCount) {
@@ -272,9 +289,9 @@ class ParentingWisdomPage extends ConsumerWidget {
       return 'Feeding logs are missing for today.';
     }
     if (feedingCount < 3) {
-      return 'Feeding frequency is lower than typical for this age.';
+      return 'Today’s feeding: $feedingCount logged (lower than typical for this age).';
     }
-    return 'Feeding routine appears consistent today.';
+    return 'Today’s feeding: $feedingCount logged (routine looks consistent).';
   }
 
   String _buildActivityInsight(int diaperCount) {
@@ -282,8 +299,8 @@ class ParentingWisdomPage extends ConsumerWidget {
       return 'Daily activity logs are limited (no diaper logs today).';
     }
     if (diaperCount < 3) {
-      return 'Activity logs are light today; continue routine observations.';
+      return 'Today’s activity logs: $diaperCount diaper checks (light routine).';
     }
-    return 'Daily activity logs show regular care intervals.';
+    return 'Today’s activity logs: $diaperCount diaper checks (regular care intervals).';
   }
 }

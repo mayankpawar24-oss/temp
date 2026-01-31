@@ -1,17 +1,66 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class GeminiService {
   late final GenerativeModel _model;
   ChatSession? _chatSession;
-  static const String _dummyApiKey = 'AIzaSyDummyKeyForDemo123456789';
+  static String _getApiKey() {
+    final key = dotenv.env['GEMINI_API_KEY'] ?? '';
+    if (key.isEmpty) {
+      print('⚠️ WARNING: GEMINI_API_KEY is empty in .env file');
+      return 'AIzaSyDummyKeyForDemo123456789'; // Fallback for demo
+    }
+    return key;
+  }
+
+  // 🚨 Emergency safety words for critical health situations
+  static const List<String> _dangerWords = [
+    'suicide',
+    'kill myself',
+    'overdose',
+    'fainting',
+    'severe bleeding',
+    'unconscious',
+    'heavy blood loss',
+    'miscarriage',
+    'premature labor',
+    'preeclampsia',
+    'sepsis',
+  ];
 
   GeminiService({String? systemInstruction}) {
-    // Use dummy key for demo purposes
+    // Load API key from .env file
+    final apiKey = _getApiKey();
     _model = GenerativeModel(
       model: 'gemini-2.5-flash',
-      apiKey: _dummyApiKey,
+      apiKey: apiKey,
       systemInstruction: systemInstruction != null ? Content.system(systemInstruction) : null,
     );
+  }
+
+  /// Checks if a message contains emergency keywords
+  bool _containsDangerWords(String text) {
+    final lowerText = text.toLowerCase();
+    return _dangerWords.any((word) => lowerText.contains(word));
+  }
+
+  /// Generates emergency response for critical health situations
+  String _generateEmergencyResponse() {
+    return '''🚨 MEDICAL EMERGENCY DETECTED
+
+This may indicate a serious health situation. Please:
+
+1. **Call Emergency Services NOW** 
+   - Dial 112 (India) or your local emergency number
+   - Do not delay seeking immediate medical help
+
+2. **Inform healthcare provider immediately** of your symptoms
+
+3. **Do not rely on AI for emergency situations**
+
+We care about your safety. Professional medical professionals are best equipped to help you right now.
+
+Stay safe. Help is available.''';
   }
 
   Future<String> generateContent(String prompt) async {
@@ -30,8 +79,14 @@ class GeminiService {
   }
 
   Future<String> sendMessage(String message) async {
-    if (_dummyApiKey.isEmpty) {
-      return 'Error: Gemini API key is missing. Please check your .env file.';
+    // 🚨 Emergency detection first - highest priority
+    if (_containsDangerWords(message)) {
+      return _generateEmergencyResponse();
+    }
+
+    final apiKey = _getApiKey();
+    if (apiKey.isEmpty || apiKey == 'AIzaSyDummyKeyForDemo123456789') {
+      return 'Error: Gemini API key is missing. Please add GEMINI_API_KEY to your .env file.';
     }
 
     try {

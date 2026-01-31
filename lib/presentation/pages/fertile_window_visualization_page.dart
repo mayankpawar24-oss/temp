@@ -340,7 +340,7 @@ class FertileWindowVisualizationPage extends ConsumerWidget {
               _buildTimelineLegendItem(
                 context,
                 const Color(0xFF66BB6A),
-                'Fertile Window\n(${fertileStartDay}-${fertileEndDay})',
+                'Fertile Window\n($fertileStartDay-$fertileEndDay)',
               ),
               _buildTimelineLegendItem(
                 context,
@@ -470,7 +470,7 @@ class FertileWindowVisualizationPage extends ConsumerWidget {
       child: Card(
         color: isInFertileWindow
             ? const Color(0xFF66BB6A).withOpacity(0.1)
-            : Theme.of(context).colorScheme.surfaceVariant,
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -479,9 +479,9 @@ class FertileWindowVisualizationPage extends ConsumerWidget {
               if (isInFertileWindow) ...[
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.favorite,
-                      color: const Color(0xFF66BB6A),
+                      color: Color(0xFF66BB6A),
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -519,9 +519,9 @@ class FertileWindowVisualizationPage extends ConsumerWidget {
               ] else if (daysUntilOvulation == 0) ...[
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.circle,
-                      color: const Color(0xFFE53935),
+                      color: Color(0xFFE53935),
                       size: 24,
                     ),
                     const SizedBox(width: 12),

@@ -14,6 +14,7 @@ import 'package:maternal_infant_care/presentation/pages/activity_ideas_page.dart
 import 'package:maternal_infant_care/presentation/pages/daily_summary_page.dart';
 import 'package:maternal_infant_care/presentation/pages/weekly_stats_page.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
+import 'package:maternal_infant_care/presentation/pages/parenting_wisdom_page.dart';
 
 class ToddlerDashboardPage extends ConsumerWidget {
   const ToddlerDashboardPage({super.key});
@@ -33,33 +34,66 @@ class ToddlerDashboardPage extends ConsumerWidget {
     final username = userMeta.username;
     final displayName = (username != null && username.isNotEmpty) ? username : 'Parent';
 
+    final theme = Theme.of(context);
+    final borderColor = theme.colorScheme.secondary.withOpacity(0.35);
+    final backgroundColor = theme.colorScheme.surfaceVariant.withOpacity(0.6);
+
     return Padding(
       padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Namaste, $displayName',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-              const Spacer(),
-              Icon(Icons.family_restroom, color: Theme.of(context).colorScheme.secondary, size: 28),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Nurturing the future.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              fontStyle: FontStyle.italic,
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.onSurface.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.06,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Icon(
+                    Icons.nightlight_round,
+                    size: 120,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Namaste, $displayName',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Supporting शैशव अवस्था (early childhood) routines.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -124,7 +158,7 @@ class ToddlerDashboardPage extends ConsumerWidget {
           'Ancient knowledge', 
           Icons.lightbulb_outline, 
           theme.colorScheme.secondary, 
-          null
+          () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ParentingWisdomPage()))
         );
       default:
         return _buildActionCard(context, card.title, '', Icons.widgets_outlined, theme.colorScheme.onSurface, null);

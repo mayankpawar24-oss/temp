@@ -139,19 +139,32 @@ class ReminderService {
     final notificationId = _getNextNotificationId();
     final updatedReminder = reminder.copyWith(notificationId: notificationId);
 
-    await NotificationService.scheduleNotification(
-      id: notificationId,
-      title: reminder.title,
-      body: reminder.description,
-      scheduledDate: reminderTime,
-    );
+    print('📱 REMINDER SERVICE: Scheduling reminder "${reminder.title}"');
+    print('   - Notification ID: $notificationId');
+    print('   - Scheduled Time: $reminderTime');
+    print('   - Title: ${reminder.title}');
+    print('   - Description: ${reminder.description}');
+
+    try {
+      await NotificationService.scheduleNotification(
+        id: notificationId,
+        title: reminder.title,
+        body: reminder.description,
+        scheduledDate: reminderTime,
+      );
+      print('✅ REMINDER SERVICE: Successfully scheduled!');
+    } catch (e) {
+      print('❌ REMINDER SERVICE ERROR: $e');
+    }
 
     return updatedReminder;
   }
 
   static Future<void> cancelReminder(int? notificationId) async {
     if (notificationId != null) {
+      print('🔔 REMINDER SERVICE: Cancelling notification $notificationId');
       await NotificationService.cancelNotification(notificationId);
+      print('✅ REMINDER SERVICE: Cancelled notification $notificationId');
     }
   }
 }

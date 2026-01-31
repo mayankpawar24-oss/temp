@@ -96,8 +96,9 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
                           (context, index) {
                             // Build rows of 2 items each
                             final startIndex = index * 2;
-                            if (startIndex >= filteredArticles.length)
+                            if (startIndex >= filteredArticles.length) {
                               return null;
+                            }
 
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 16),
@@ -165,13 +166,21 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Text(
-              'Discover Helpful\nInsights & Guides',
+              'संसाधन अन्वेषण\n(Explore Resources)',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.secondary,
               ),
             ),
           ),
+          Text(
+            'विशेष लेख (Featured Articles)',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface.withOpacity(0.7),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
 
           // Search Bar - Ornate styling with gold borders
           Container(
@@ -212,7 +221,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
 
           // Explore Guides Section
           Text(
-            'Explore Guides',
+            'अध्ययन मार्गदर्शिका (Learning Guides)',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.secondary,
@@ -275,7 +284,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
 
           // Category Chips
           Text(
-            'Browse Articles',
+            'अनुशंसित पठन (Recommended Reads)',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.secondary,
@@ -360,7 +369,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
         const ResourceArticleModel(
           id: 'preg1',
           title: 'Week-by-Week Guide',
-          description: 'Track your baby\'s development journey.',
+          description: 'Monitor fetal गर्भविकास (development) across each trimester.',
           icon: Icons.calendar_month,
           color: Color(0xFFF48FB1), // Soft Pink
           category: 'Development',
@@ -369,7 +378,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
 # Week-by-Week Pregnancy Guide
 
 ## First Trimester (Week 1-12)
-Your body is undergoing major changes. You might experience nausea, fatigue, and tender breasts.
+During गर्भावस्था (pregnancy), your body undergoes major changes. You might experience nausea, fatigue, and tender breasts as गर्भविकास (fetal development) begins.
 
 *   **Week 4:** Baby is the size of a poppy seed.
 *   **Week 8:** Baby is the size of a kidney bean.
@@ -393,7 +402,7 @@ The final stretch! You may feel more uncomfortable as baby grows.
         const ResourceArticleModel(
           id: 'preg2',
           title: 'Pregnancy Nutrition',
-          description: 'Eating healthy for two: Essential nutrients.',
+          description: 'Evidence-based nutritional support during गर्भावस्था (pregnancy).',
           icon: Icons.restaurant_menu,
           color: Color(0xFFA5D6A7), // Soft Green
           category: 'Nutrition',
@@ -401,7 +410,7 @@ The final stretch! You may feel more uncomfortable as baby grows.
           content: '''
 # Nutrition During Pregnancy
 
-Eating a balanced diet is crucial for your baby's development.
+Eating a balanced diet is crucial for गर्भविकास (fetal development) during गर्भावस्था (pregnancy).
 
 ## Key Nutrients
 *   **Folic Acid:** Prevents birth defects. Found in leafy greens and fortified cereals.
@@ -419,13 +428,15 @@ Eating a balanced diet is crucial for your baby's development.
         const ResourceArticleModel(
           id: 'preg3',
           title: 'Labor Preparation',
-          description: 'Signs of labor and hospital bag checklist.',
+          description: 'Recognition of labor signs and preparation guidelines for delivery.',
           icon: Icons.pregnant_woman,
           color: Color(0xFFCE93D8), // Soft Purple
           category: 'Health',
           readingTime: '6 min',
           content: '''
 # Preparing for Labor
+
+Understanding labor signs during गर्भावस्था (pregnancy) helps you recognize when delivery is approaching.
 
 ## Signs of Labor
 1.  **Contractions:** Regular, stronger, and closer together.
@@ -442,7 +453,7 @@ Eating a balanced diet is crucial for your baby's development.
         const ResourceArticleModel(
           id: 'preg4',
           title: 'Safe Exercises',
-          description: 'Staying active safely during pregnancy.',
+          description: 'Research-backed exercise guidelines during गर्भावस्था (pregnancy).',
           icon: Icons.fitness_center,
           color: Color(0xFF90CAF9), // Soft Blue
           category: 'Health',
@@ -450,7 +461,7 @@ Eating a balanced diet is crucial for your baby's development.
           content: '''
 # Safe Exercises During Pregnancy
 
-Staying active is healthy for both you and your baby! It can improve mood, sleep, and even make labor easier.
+Staying active during गर्भावस्था (pregnancy) is healthy for both you and your baby! It can improve mood, sleep, and even make labor easier while supporting overall ओजस् (vitality).
 
 ## Recommended Activities
 *   **Walking:** The perfect low-impact exercise. Easy on the joints and can be done anywhere.
@@ -476,7 +487,7 @@ Staying active is healthy for both you and your baby! It can improve mood, sleep
         const ResourceArticleModel(
           id: 'preg5',
           title: 'Mental Wellness',
-          description: 'Managing stress and emotions.',
+          description: 'Emotional well-being and stress management during गर्भावस्था (pregnancy).',
           icon: Icons.spa,
           color: Color(0xFF80CBC4), // Soft Teal
           category: 'Mother Care',
@@ -484,7 +495,7 @@ Staying active is healthy for both you and your baby! It can improve mood, sleep
           content: '''
 # Your Mental Wellness Matters
 
-Pregnancy is a time of huge transition. It's completely normal to feel a mix of excitement, anxiety, and everything in between.
+गर्भावस्था (Pregnancy) is a time of huge transition. It's completely normal to feel a mix of excitement, anxiety, and everything in between as you navigate this journey.
 
 ## Managing Your Emotions
 *   **Acknowledge Your Feelings:** Don't judge yourself for feeling anxious or overwhelmed. 
@@ -510,7 +521,7 @@ It's time to talk to a doctor or therapist if you experience:
         const ResourceArticleModel(
           id: 'preg6',
           title: 'Breastfeeding 101',
-          description: 'Basics of latching, positions, and supply.',
+          description: 'Fundamentals of lactation and infant feeding initiation.',
           icon: Icons.baby_changing_station,
           color: Color(0xFFCE93D8), // Soft Purple
           category: 'Baby Care',
@@ -519,7 +530,7 @@ It's time to talk to a doctor or therapist if you experience:
 # Breastfeeding 101
 
 ## The Basics
-Breastfeeding is a learned skill for both you and baby.
+Breastfeeding is a learned skill for both you and baby, essential for supporting शैशव अवस्था (early childhood) nutrition.
 
 ## Tips for Success
 *   **Skin-to-Skin:** Helps bonding and milk flow.
@@ -533,13 +544,15 @@ If it hurts, break suction and try again. Don't hesitate to see a lactation cons
         const ResourceArticleModel(
           id: 'preg7',
           title: 'Postpartum Recovery',
-          description: 'Healing your body after birth.',
+          description: 'Physical and emotional recovery guidelines following delivery.',
           icon: Icons.healing,
           color: Color(0xFFFFCC80), // Soft Orange
           category: 'Mother Care',
           readingTime: '5 min',
           content: '''
 # Postpartum Recovery
+
+Recovery after गर्भावस्था (pregnancy) requires patience and self-care as your body heals.
 
 ## What to Expect
 *   **Lochia:** Bleeding for 4-6 weeks is normal.
@@ -561,7 +574,7 @@ If it hurts, break suction and try again. Don't hesitate to see a lactation cons
         const ResourceArticleModel(
           id: 'ttc1',
           title: 'Cycle Basics',
-          description: 'Understand phases and fertile windows.',
+          description: 'Comprehensive understanding of menstrual ऋतुचक्र (cycle) phases.',
           icon: Icons.calendar_today,
           color: Color(0xFFB39DDB),
           category: 'Fertility',
@@ -569,7 +582,7 @@ If it hurts, break suction and try again. Don't hesitate to see a lactation cons
           content: '''
 # Understanding Your Cycle
 
-## The Phases
+The menstrual ऋतुचक्र (cycle) consists of four distinct phases that prepare the body for potential गर्भधारण (conception).
 * **Menstrual Phase:** Bleeding days (Day 1 begins your cycle).
 * **Follicular Phase:** Hormones prepare an egg to mature.
 * **Ovulation:** Egg release, typically ~14 days before your next period.
@@ -583,13 +596,15 @@ Tracking cycle length helps estimate this window.
         const ResourceArticleModel(
           id: 'ttc2',
           title: 'Ovulation Tracking',
-          description: 'Tools and signs to watch for.',
+          description: 'Evidence-based methods for monitoring ovulation and fertile windows.',
           icon: Icons.favorite_border,
           color: Color(0xFFF48FB1),
           category: 'Tracking',
           readingTime: '5 min',
           content: '''
 # Ovulation Tracking
+
+Tracking ovulation during your इतुचक्र (menstrual cycle) helps identify the optimal window for गर्भधारण (conception).
 
 ## Common Signs
 * Increased cervical mucus (egg-white consistency)
@@ -607,7 +622,7 @@ Consistency improves accuracy.
         const ResourceArticleModel(
           id: 'ttc3',
           title: 'Lifestyle for Fertility',
-          description: 'Nutrition, sleep, and stress tips.',
+          description: 'Holistic wellness practices supporting गर्भधारण (conception).',
           icon: Icons.spa_outlined,
           color: Color(0xFFA5D6A7),
           category: 'Wellness',
@@ -615,7 +630,7 @@ Consistency improves accuracy.
           content: '''
 # Lifestyle Support for Fertility
 
-* Maintain a balanced diet with whole grains, fruits, vegetables, and healthy fats.
+Supporting गर्भधारण (conception) through lifestyle includes maintaining संतुलन (balance) in daily routines: with whole grains, fruits, vegetables, and healthy fats.
 * Aim for 7–9 hours of sleep to support hormone balance.
 * Manage stress with gentle movement, meditation, or journaling.
 
@@ -628,7 +643,7 @@ If you have concerns, consult a healthcare professional.
         const ResourceArticleModel(
           id: 'tod1',
           title: 'Developmental Milestones',
-          description: 'What to expect 1-3 years.',
+          description: 'Tracking शैशव अवस्था (early childhood) developmental progression (1-3 years).',
           icon: Icons.accessibility,
           color: Color(0xFFFFCC80), // Soft Orange
           category: 'Development',
@@ -636,7 +651,7 @@ If you have concerns, consult a healthcare professional.
           content: '''
 # Toddler Milestones
 
-## 12 Months
+During शैशव अवस्था (early childhood), children achieve significant विकास (development) milestones:
 *   Pulls up to stand
 *   Cruises or takes first steps
 *   Says "mama" or "dada"
@@ -655,7 +670,7 @@ If you have concerns, consult a healthcare professional.
         const ResourceArticleModel(
           id: 'tod2',
           title: 'Feeding Guide',
-          description: 'Solids, snacks and dealing with picky eaters.',
+          description: 'Evidence-based nutrition and feeding strategies for toddlers.',
           icon: Icons.child_care,
           color: Color(0xFF80CBC4), // Soft Teal
           category: 'Nutrition',
@@ -663,13 +678,13 @@ If you have concerns, consult a healthcare professional.
           content: '''
 # Feeding Your Toddler
 
-Offer a variety of foods. It's normal for appetite to fluctuate. Avoid force-feeding. Offer 3 meals and 2 snacks daily.
+Nutrition during शैशव अवस्था (early childhood) supports healthy वृद्धि (growth). Offer a variety of foods. It's normal for appetite to fluctuate. Avoid force-feeding. Offer 3 meals and 2 snacks daily.
 ''',
         ),
         const ResourceArticleModel(
           id: 'tod3',
           title: 'Sleep Training',
-          description: 'Tips for better nights and naps.',
+          description: 'Research-based approaches to establishing healthy sleep routines.',
           icon: Icons.bedtime,
           color: Color(0xFF9FA8DA), // Soft Indigo
           category: 'Baby Care',
@@ -677,13 +692,13 @@ Offer a variety of foods. It's normal for appetite to fluctuate. Avoid force-fee
           content: '''
 # Sleep Tips
 
-Establish a consistent bedtime routine. Keep the room dark and cool. Be patient with regressions. Aim for 11-14 hours of sleep total.
+Establishing healthy sleep patterns during शैशव अवस्था (early childhood) supports overall विकास (development). Establish a consistent bedtime routine. Keep the room dark and cool. Be patient with regressions. Aim for 11-14 hours of sleep total.
 ''',
         ),
         const ResourceArticleModel(
           id: 'tod4',
           title: 'Vaccination Schedule',
-          description: 'Immunization checklist and guide.',
+          description: 'Standard immunization protocols for शैशव अवस्था (early childhood).',
           icon: Icons.vaccines,
           color: Color(0xFFEF9A9A), // Soft Red
           category: 'Health',
@@ -691,13 +706,13 @@ Establish a consistent bedtime routine. Keep the room dark and cool. Be patient 
           content: '''
 # Vaccinations
 
-Check with your pediatrician for the standard schedule (e.g., MMR, Varicella, DTaP boosters). Keep your records updated.
+Protecting your child during शैशव अवस्था (early childhood) through immunization is essential. Check with your pediatrician for the standard schedule (e.g., MMR, Varicella, DTaP boosters). Keep your records updated.
 ''',
         ),
         const ResourceArticleModel(
           id: 'tod5',
           title: 'Potty Training',
-          description: 'Signs of readiness and tips.',
+          description: 'Developmental readiness indicators and evidence-based training strategies.',
           icon: Icons.wc,
           color: Color(0xFFCE93D8), // Soft Purple
           category: 'Baby Care',
@@ -705,7 +720,7 @@ Check with your pediatrician for the standard schedule (e.g., MMR, Varicella, DT
           content: '''
 # Potty Training
 
-Most children are ready between 2 and 3 years old. Look for signs like staying dry for longer periods and showing interest in the bathroom.
+This विकास (development) milestone during शैशव अवस्था (early childhood) typically occurs between 2-3 years. Most children are ready between 2 and 3 years old. Look for signs like staying dry for longer periods and showing interest in the bathroom.
 ''',
         ),
       ];
@@ -729,7 +744,6 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Card(
       elevation: 0,

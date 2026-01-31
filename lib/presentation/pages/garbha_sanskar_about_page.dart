@@ -82,10 +82,10 @@ class GarbhaSanskarAboutPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Core Principles
-            _SectionCard(
+            const _SectionCard(
               title: 'Core Principles',
               icon: Icons.spa,
-              color: const Color(0xFFCD853F),
+              color: Color(0xFFCD853F),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -96,7 +96,7 @@ class GarbhaSanskarAboutPage extends StatelessWidget {
                         'Cultivating calmness, joy, and emotional balance through '
                         'meditation, music, and positive thinking.',
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _PrincipleItem(
                     icon: Icons.nature,
                     title: 'Environment',
@@ -104,7 +104,7 @@ class GarbhaSanskarAboutPage extends StatelessWidget {
                         'Creating a peaceful, harmonious space with gentle sounds, '
                         'pleasant aromas, and natural surroundings.',
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _PrincipleItem(
                     icon: Icons.book,
                     title: 'Knowledge & Reflection',
@@ -112,7 +112,7 @@ class GarbhaSanskarAboutPage extends StatelessWidget {
                         'Reading uplifting stories, practicing gratitude, and '
                         'engaging in creative activities like art or music.',
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   _PrincipleItem(
                     icon: Icons.favorite,
                     title: 'Connection',

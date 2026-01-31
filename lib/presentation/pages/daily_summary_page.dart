@@ -201,7 +201,7 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
                             color: Colors.deepOrange.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.directions_walk,
+                          child: const Icon(Icons.directions_walk,
                               color: Colors.deepOrange, size: 18),
                         ),
                         const SizedBox(width: 8),
@@ -363,7 +363,7 @@ class _DailySummaryPageState extends ConsumerState<DailySummaryPage> {
             time: c.startTime,
             title: 'Contraction Recorded',
             description:
-                'Duration: ${c.endTime != null ? c.endTime!.difference(c.startTime).inSeconds : "N/A"} seconds',
+                'Duration: ${c.endTime!.difference(c.startTime).inSeconds} seconds',
             icon: Icons.psychology,
             color: theme.colorScheme.secondary,
           )));

@@ -53,7 +53,9 @@ class PregnantDashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Your sacred journey begins here.',
+            'Supporting गर्भावस्था (pregnancy) wellness and गर्भविकास (fetal development) awareness.',
+            softWrap: true,
+            maxLines: null,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontStyle: FontStyle.italic,

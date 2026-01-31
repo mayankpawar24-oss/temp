@@ -6,12 +6,16 @@ class SmartReminderCard extends StatelessWidget {
   final ReminderModel reminder;
   final VoidCallback onDismiss;
   final VoidCallback onComplete;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const SmartReminderCard({
     super.key,
     required this.reminder,
     required this.onDismiss,
     required this.onComplete,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -137,9 +141,9 @@ class SmartReminderCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
-                    onPressed: onComplete,
+                    onPressed: onAction ?? onComplete,
                     icon: const Icon(Icons.check, size: 16),
-                    label: const Text('Done'),
+                    label: Text(actionLabel ?? 'Done'),
                     style: FilledButton.styleFrom(
                        visualDensity: VisualDensity.compact,
                     ),
@@ -168,6 +172,7 @@ class SmartReminderCard extends StatelessWidget {
       case 'sleep': return Icons.bedtime;
       case 'medical': return Icons.medical_services;
       case 'vaccination': return Icons.vaccines;
+      case 'story': return Icons.menu_book;
       default: return Icons.notifications_active;
     }
   }
@@ -178,6 +183,7 @@ class SmartReminderCard extends StatelessWidget {
       case 'sleep': return Colors.indigo;
       case 'medical': return Colors.red;
       case 'vaccination': return Colors.orange;
+      case 'story': return Colors.purple;
       default: return Theme.of(context).colorScheme.primary;
     }
   }

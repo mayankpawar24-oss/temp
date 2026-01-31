@@ -15,16 +15,41 @@ class DashboardPreferencesRepository {
 
   Future<void> init() async {
     _box = await Hive.openBox<DashboardCardModel>(AppConstants.dashboardBox);
+    
+    // TEMPORARY: Clear old TTC cards and reinitialize with ovulation_prediction
+    print('DEBUG: Checking for old TTC card data...');
+    final oldTTCCards = _box.values.where((card) => card.id.startsWith(_tryingPrefix)).toList();
+    if (oldTTCCards.isNotEmpty) {
+      print('DEBUG: Found ${oldTTCCards.length} old TTC cards, checking if ovulation_prediction exists...');
+      final hasOvulation = oldTTCCards.any((card) => card.widgetType == 'ovulation_prediction');
+      if (!hasOvulation) {
+        print('DEBUG: No ovulation_prediction card found, clearing and reinitializing TTC defaults');
+        // Remove old cards
+        for (var card in oldTTCCards) {
+          _box.delete(card.id);
+        }
+        // Reinitialize with new defaults
+        _initializeDefaults(UserProfileType.tryingToConceive);
+      }
+    }
   }
 
   // Get cards for a specific user type
   List<DashboardCardModel> getCards(UserProfileType type) {
     final prefix = type == UserProfileType.pregnant
         ? _pregnantPrefix
-        : (type == UserProfileType.tryingToConceive ? _tryingPrefix : _toddlerPrefix);
+        : type == UserProfileType.tryingToConceive 
+            ? _tryingPrefix 
+            : _toddlerPrefix;
     final cards = _box.values.where((card) => card.id.startsWith(prefix)).toList();
     
+    print('DEBUG DashboardRepo: getCards for $type, prefix=$prefix, found ${cards.length} cards');
+    for (var card in cards) {
+      print('  - ${card.widgetType}: ${card.title} (id: ${card.id})');
+    }
+    
     if (cards.isEmpty) {
+      print('DEBUG DashboardRepo: No cards found, initializing defaults');
       return _initializeDefaults(type);
     }
     
@@ -53,7 +78,9 @@ class DashboardPreferencesRepository {
     List<DashboardCardModel> defaults = [];
     final prefix = type == UserProfileType.pregnant
         ? _pregnantPrefix
-        : (type == UserProfileType.tryingToConceive ? _tryingPrefix : _toddlerPrefix);
+        : type == UserProfileType.tryingToConceive 
+            ? _tryingPrefix 
+            : _toddlerPrefix;
 
     if (type == UserProfileType.pregnant) {
       defaults = [
@@ -68,7 +95,8 @@ class DashboardPreferencesRepository {
       defaults = [
         DashboardCardModel(id: '${prefix}fertility_overview', title: 'Fertility Overview', widgetType: 'fertility_overview', order: 0),
         DashboardCardModel(id: '${prefix}ovulation_window', title: 'Ovulation Window', widgetType: 'ovulation_window', order: 1),
-        DashboardCardModel(id: '${prefix}tips', title: 'Fertility Tips', widgetType: 'daily_tips', order: 2),
+        DashboardCardModel(id: '${prefix}ovulation_prediction', title: 'ML Ovulation Prediction', widgetType: 'ovulation_prediction', order: 2),
+        DashboardCardModel(id: '${prefix}tips', title: 'Fertility Tips', widgetType: 'daily_tips', order: 3),
       ];
     } else {
       defaults = [

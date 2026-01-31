@@ -7,7 +7,6 @@ import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart'
 import 'package:maternal_infant_care/presentation/viewmodels/language_provider.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/translation_provider.dart';
 import 'package:maternal_infant_care/presentation/pages/auth_page.dart';
-import 'package:maternal_infant_care/presentation/pages/onboarding_page.dart';
 import 'package:maternal_infant_care/presentation/pages/settings_page.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 
@@ -21,7 +20,6 @@ class ProfilePage extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final currentLanguageCode = ref.watch(languageProvider);
     final currentLanguage = AppLanguage.fromCode(currentLanguageCode);
-    final languageNotifier = ref.read(languageProvider.notifier);
     final userMeta = ref.watch(userMetaProvider);
 
     final userEmail = user?['email'] as String?;
@@ -146,7 +144,7 @@ class ProfilePage extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                     title: const Tr('profile.language'),
-                    subtitle: Text('${currentLanguage.nativeName}'),
+                    subtitle: Text(currentLanguage.nativeName),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
                       _showLanguageDialog(context, ref, currentLanguage);
@@ -218,7 +216,7 @@ class ProfilePage extends ConsumerWidget {
                               Container(
                                 width: 8,
                                 height: 8,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.orange,
                                   shape: BoxShape.circle,
                                 ),

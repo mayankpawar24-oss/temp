@@ -70,7 +70,7 @@ class GarbhaSanskarActivitiesPage extends StatelessWidget {
             icon: Icons.self_improvement,
             color: const Color(0xFFDAA520),
             children: [
-              _YogaCard(
+              const _YogaCard(
                 name: 'Butterfly Pose (Baddha Konasana)',
                 description:
                     'Sit with soles of feet together, gently press knees down. Opens hips and promotes relaxation.',
@@ -78,7 +78,7 @@ class GarbhaSanskarActivitiesPage extends StatelessWidget {
                 duration: '2-5 min',
                 benefits: 'Hip flexibility, calming',
               ),
-              _YogaCard(
+              const _YogaCard(
                 name: 'Cat-Cow Stretch',
                 description:
                     'On hands and knees, alternate arching and rounding your back. Gentle spinal movement.',
@@ -86,7 +86,7 @@ class GarbhaSanskarActivitiesPage extends StatelessWidget {
                 duration: '3-5 min',
                 benefits: 'Back relief, flexibility',
               ),
-              _YogaCard(
+              const _YogaCard(
                 name: 'Child\'s Pose (Balasana)',
                 description:
                     'Kneel and sit back on heels, stretch arms forward. Deeply restorative and calming.',
@@ -185,28 +185,28 @@ class GarbhaSanskarActivitiesPage extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Color Therapy
-          _ActivitySection(
+          const _ActivitySection(
             title: 'Color Therapy',
             icon: Icons.color_lens,
-            color: const Color(0xFFB8860B),
+            color: Color(0xFFB8860B),
             children: [
               _ColorCard(
-                color: const Color(0xFFDAA520),
+                color: Color(0xFFDAA520),
                 name: 'Gold',
                 meaning: 'Traditionally associated with wisdom and prosperity',
               ),
               _ColorCard(
-                color: const Color(0xFF87CEEB),
+                color: Color(0xFF87CEEB),
                 name: 'Sky Blue',
                 meaning: 'Often linked to peace and tranquility',
               ),
               _ColorCard(
-                color: const Color(0xFF90EE90),
+                color: Color(0xFF90EE90),
                 name: 'Light Green',
                 meaning: 'Symbolizes growth and harmony in nature',
               ),
               _ColorCard(
-                color: const Color(0xFFDDA0DD),
+                color: Color(0xFFDDA0DD),
                 name: 'Plum',
                 meaning: 'Associated with spiritual awareness',
               ),

@@ -6,6 +6,7 @@ import 'package:maternal_infant_care/presentation/widgets/customizable_dashboard
 import 'package:maternal_infant_care/presentation/viewmodels/user_meta_provider.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/repository_providers.dart';
 import 'package:maternal_infant_care/presentation/pages/fertile_window_visualization_page.dart';
+import 'package:maternal_infant_care/presentation/pages/ovulation_prediction_page.dart';
 
 class TryingToConceiveDashboardPage extends ConsumerWidget {
   const TryingToConceiveDashboardPage({super.key});
@@ -27,6 +28,7 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
       padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -43,7 +45,9 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Your fertility journey starts here.',
+            'Fertility awareness through balanced health and ऋतुचक्र (menstrual cycle) tracking.',
+            softWrap: true,
+            maxLines: null,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontStyle: FontStyle.italic,
@@ -55,11 +59,15 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
   }
 
   Widget _buildCardContent(BuildContext context, WidgetRef ref, DashboardCardModel card) {
+    print('DEBUG TTC: Building card with widgetType: ${card.widgetType}, title: ${card.title}');
     switch (card.widgetType) {
       case 'fertility_overview':
         return _buildFertilityOverview(context, ref);
       case 'ovulation_window':
         return _buildOvulationWindow(context, ref);
+      case 'ovulation_prediction':
+        print('DEBUG TTC: Building ovulation_prediction card');
+        return _buildOvulationPredictionCard(context);
       case 'daily_tips':
         return _buildFertilityTips(context);
       default:
@@ -184,6 +192,56 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOvulationPredictionCard(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.favorite, color: Theme.of(context).colorScheme.primary, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  'ML Ovulation Prediction',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Use advanced machine learning to predict your exact ovulation day based on your cycle parameters.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const OvulationPredictionPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.trending_up),
+                label: const Text('Predict Now'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
             ),
           ],
         ),

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:maternal_infant_care/domain/services/gemini_service.dart';
 import 'package:maternal_infant_care/presentation/viewmodels/user_provider.dart';
@@ -13,20 +11,50 @@ import 'package:uuid/uuid.dart';
 final geminiServiceProvider = Provider<GeminiService>((ref) {
   final userProfile = ref.watch(userProfileProvider);
 
-  String instruction = 'You are a helpful maternal and infant care assistant.';
+  String instruction = '''You are Vatsalya AI, a compassionate women's reproductive health and maternal care assistant.
+
+FOCUS AREAS:
+* Menstrual health and cycle tracking
+* Pregnancy care across all trimesters
+* Postpartum recovery and wellness
+* Parenting and caring for toddlers
+* Nutrition, hormonal balance, mental wellbeing
+
+PERSONALITY:
+* Warm and supportive
+* Reassuring and empathetic
+* Positive and encouraging
+* Calm and gentle tone
+* Non-judgmental and inclusive
+
+STRICT RULES:
+
+1. ALWAYS respond in an affirmative and comforting tone
+2. Do NOT change medical facts just to agree with user
+3. Do NOT diagnose diseases or medical conditions
+4. Do NOT prescribe medicines, dosages, or specific treatments
+5. ALWAYS encourage doctor/healthcare professional consultation when needed
+6. For out-of-scope topics: "I specialize in menstrual, pregnancy, and maternal health topics. How can I help with those?"
+7. For emotional concerns: Show deep empathy and validate feelings
+8. For danger symptoms: Recommend URGENT medical help without delay
+
+CRITICAL - NEVER OFFER MEDICAL DIAGNOSIS:
+* User says: "I have terrible headaches and blurred vision"
+* Wrong: "You likely have preeclampsia"
+* Right: "Please contact your healthcare provider urgently as these could indicate a serious condition"
+
+YOUR GOAL: Make users feel safe, supported, informed, and empowered.''';
+
   if (userProfile == UserProfileType.pregnant) {
     instruction +=
-        ' The user is currently pregnant. Provide advice relevant to pregnancy.';
+        '\n\nCURRENT USER CONTEXT: The user is pregnant. Tailor advice to pregnancy-specific needs, concerns, and trimester-appropriate guidance.';
   } else if (userProfile == UserProfileType.tryingToConceive) {
     instruction +=
-        ' The user is trying to conceive. Provide fertility, ovulation, and cycle-tracking guidance.';
+        '\n\nCURRENT USER CONTEXT: The user is trying to conceive. Provide guidance on fertility, ovulation tracking, cycle awareness, lifestyle optimization, and conception readiness.';
   } else if (userProfile == UserProfileType.toddlerParent) {
     instruction +=
-        ' The user is a parent of a toddler. Provide advice relevant to parenting a toddler.';
+        '\n\nCURRENT USER CONTEXT: The user is a parent caring for a toddler. Provide advice on toddler development, nutrition, sleep, behavior, and parental wellbeing.';
   }
-
-  instruction +=
-      ' Do not prescribe medical treatments. Always advise consulting a healthcare professional for medical issues. If the query is not related to maternal or infant care, politely guide the user back to the topic.';
 
   return GeminiService(systemInstruction: instruction);
 });

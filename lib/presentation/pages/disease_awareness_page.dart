@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maternal_infant_care/core/theme/app_theme.dart';
 
 class DiseaseAwarenessPage extends ConsumerStatefulWidget {
   const DiseaseAwarenessPage({super.key});
