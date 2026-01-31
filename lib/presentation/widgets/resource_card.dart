@@ -61,24 +61,28 @@ class ResourceCard extends StatelessWidget {
                       child: Icon(article.icon, color: article.color, size: 22),
                     ),
                     if (article.category != 'General')
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: colorScheme.secondary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: colorScheme.secondary.withOpacity(0.4),
-                            width: 1,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: colorScheme.secondary.withOpacity(0.4),
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          article.category,
-                          style: TextStyle(
-                            color: colorScheme.secondary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                          child: Text(
+                            article.category,
+                            style: TextStyle(
+                              color: colorScheme.secondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                       ),
@@ -87,15 +91,18 @@ class ResourceCard extends StatelessWidget {
                 const SizedBox(
                     height:
                         16), // Replaced Spacer to avoid unbound height issues
-                Text(
-                  article.title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                    height: 1.2,
+                Flexible(
+                  child: Text(
+                    article.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                      height: 1.2,
+                    ),
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text(

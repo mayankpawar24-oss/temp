@@ -156,6 +156,7 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final userProfile = ref.watch(userProfileProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -271,13 +272,15 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const DailyTipsPage())),
               ),
-              _CategoryCard(
-                title: 'Labour Prep',
-                icon: Icons.child_friendly,
-                color: const Color(0xFF8B4513),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const HospitalBagPage())),
-              ),
+              // Only show Labour Prep for pregnant users
+              if (userProfile == UserProfileType.pregnant)
+                _CategoryCard(
+                  title: 'Labour Prep',
+                  icon: Icons.child_friendly,
+                  color: const Color(0xFF8B4513),
+                  onTap: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const HospitalBagPage())),
+                ),
             ],
           ),
           const SizedBox(height: 24),
@@ -289,6 +292,8 @@ class _ResourcesPageState extends ConsumerState<ResourcesPage> {
               fontWeight: FontWeight.bold,
               color: colorScheme.secondary,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
           SingleChildScrollView(

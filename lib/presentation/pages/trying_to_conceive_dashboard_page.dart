@@ -32,14 +32,18 @@ class TryingToConceiveDashboardPage extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Text(
-                'Namaste, $displayName',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+              Expanded(
+                child: Text(
+                  'Namaste, $displayName',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               Icon(Icons.favorite_border, color: Theme.of(context).colorScheme.secondary, size: 28),
             ],
           ),
