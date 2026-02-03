@@ -80,6 +80,8 @@ class ToddlerDashboardPage extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,
                         ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   const SizedBox(height: 8),
                   Text(
